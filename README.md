@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Billboard.me
 
-## Getting Started
+A marketplace for physical advertising inventory. People already own objects and
+occupy spaces that others look at — a MacBook lid, a jersey, a T-shirt — and
+those surfaces can be sold as advertising spots.
 
-First, run the development server:
+The product is invite-only and high-touch right now. The public site is a landing
+page and two waitlist forms; everything else is recruited and closed by hand.
+
+## Read this first
+
+**[`AGENTS.md`](AGENTS.md) is the single source of truth** for engineering rules,
+product scope, and workflow. Read it completely before making any change, whether
+you are a person or a coding agent.
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
+cp .env.example .env.local   # then fill in the values
+pnpm db:migrate              # creates the waitlist tables
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open <http://localhost:3000>.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Full setup instructions, including Supabase, are in
+[`docs/development/setup.md`](docs/development/setup.md).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+| Script | Does |
+| --- | --- |
+| `pnpm dev` | Development server |
+| `pnpm build` | Production build |
+| `pnpm start` | Serve the production build |
+| `pnpm lint` | ESLint |
+| `pnpm typecheck` | `tsc --noEmit` |
+| `pnpm db:generate` | Generate a Drizzle migration from the schema |
+| `pnpm db:migrate` | Apply pending migrations |
+| `pnpm db:studio` | Browse the database (this is how you read waitlist entries) |
 
-To learn more about Next.js, take a look at the following resources:
+## Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Next.js (App Router) + TypeScript, Tailwind CSS, Supabase Postgres via Drizzle
+ORM, Zod for validation, Cloudflare R2 for storage. Better Auth and a payment
+provider come later. It is deliberately a boring monolith.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Layout
 
-## Deploy on Vercel
+```
+src/app/(marketing)   Public landing page and waitlist routes
+src/app/api           Route handlers
+src/components        UI, grouped by area (marketing, waitlist)
+src/lib               Domain and infrastructure modules (db, waitlist, site)
+drizzle               Generated SQL migrations — never edit an applied one
+docs                  Architecture, product, decisions (ADRs), status, design
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Documentation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [`docs/architecture/overview.md`](docs/architecture/overview.md) — how the app
+  is shaped
+- [`docs/decisions/`](docs/decisions/) — ADRs; significant decisions live here
+- [`docs/design/design-system.md`](docs/design/design-system.md) — the art
+  direction, read before touching marketing UI
+- [`docs/status/current-state.md`](docs/status/current-state.md) — what actually
+  exists today
+- [`docs/development/agent-workflow.md`](docs/development/agent-workflow.md) —
+  issue → branch → implementation → PR
+
+Documentation must stay true to the code. If you change behaviour, update the
+docs in the same pull request.
