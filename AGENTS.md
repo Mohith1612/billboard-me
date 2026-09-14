@@ -19,6 +19,12 @@ Core insight: People already own physical objects and occupy physical spaces tha
 - Real sellers are recruited manually by the founder
 - Success metric = closed paid campaigns with proof and payout
 
+This describes the implemented public scope. The staged product plan is in
+[`docs/product/prd.md`](docs/product/prd.md); future approved sponsorship pages
+do not imply public self-serve seller publishing. Implement only a dependency-ready
+issue from [`docs/status/backlog.md`](docs/status/backlog.md) after founder review
+of its product/architecture decisions. Planning documents do not claim features exist.
+
 We are **not** building a full open marketplace yet.
 
 ---
@@ -30,6 +36,7 @@ We are **not** building a full open marketplace yet.
 - **Never** push directly to `main`
 - **Never** merge your own PR
 - **Never** force-push `main`
+- **Never** force-push any task or shared branch; use normal commits and pushes
 - Every change must go through: Issue → Branch (or worktree) → Implementation → Tests → Documentation update → PR → Human review → Human merge
 
 ### Workflow for every task
@@ -40,7 +47,7 @@ We are **not** building a full open marketplace yet.
 5. Run lint, typecheck, tests, and build
 6. Update documentation so it matches the code
 7. Commit with clear messages
-8. Open a PR that references the issue
+8. Push the task branch and open a PR that references the issue
 9. Stop. Wait for human review and merge
 
 ### Code & Architecture
@@ -50,6 +57,7 @@ We are **not** building a full open marketplace yet.
 - Database changes only through Drizzle migrations
 - Never edit an already-applied migration
 - Do not add dependencies without clear justification
+- Do not delete tests or suppress required checks merely to make CI pass
 - Do not hard-code the five original asset categories — keep the domain model generic even if the UI only shows two
 
 ### Documentation
@@ -64,17 +72,21 @@ We are **not** building a full open marketplace yet.
 
 ---
 
-## 3. Current Tech Stack
+## 3. Stack and implementation status
 
 - **Framework**: Next.js (App Router) + TypeScript
-- **UI**: Tailwind CSS + shadcn/ui
+- **UI**: Tailwind CSS; shadcn/ui is planned, not installed
 - **Database**: Supabase Postgres + Drizzle ORM
 - **Auth**: Better Auth (to be added)
-- **Storage**: Cloudflare R2
+- **Storage**: Cloudflare R2 (planned, not integrated)
 - **Validation**: Zod
 - **Email**: Resend (later)
 - **Analytics / Errors**: PostHog + Sentry (later)
 - **Deploy**: Cloudflare (preferred)
+
+Read [`docs/status/current-state.md`](docs/status/current-state.md) for verified
+implementation and [`docs/architecture/overview.md`](docs/architecture/overview.md)
+for proposed modules, provider/runtime gates and alternatives.
 
 ---
 
@@ -92,6 +104,12 @@ User
 └── Payout
 
 Keep this abstraction even while the UI only exposes MacBook and Jersey/T-shirt.
+
+The diagram names domain concepts, not literal foreign-key ownership. Before
+schema or lifecycle work, read [`CONTEXT.md`](CONTEXT.md),
+[`docs/architecture/database.md`](docs/architecture/database.md), and
+[`ADR-003`](docs/decisions/ADR-003-inventory-and-transaction-boundaries.md).
+The refined relationships remain proposed until the founder approves DOMAIN-001.
 
 ---
 
