@@ -42,4 +42,6 @@ yarn-error.log*
 next-env.d.ts
 
 # drizzle
-drizzle/meta
+# NOTE: drizzle/meta is intentionally committed. drizzle-kit uses the journal
+# and snapshots in it to diff future schema changes against the applied ones.
+# Ignoring it makes every `db:generate` re-emit the full schema as a new migration.
