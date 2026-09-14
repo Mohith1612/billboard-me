@@ -1,26 +1,372 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+   Billboard.me design tokens
+   Art direction: "media kit" — warm print paper, industrial ink, one vermilion
+   accent borrowed from out-of-home advertising and road signage.
+   Documented in docs/design/design-system.md
+--------------------------------------------------------------------------- */
+
+@theme {
+  /* Surfaces — warm-biased neutrals, never zero-chroma grey */
+  --color-paper: #f3efe7;
+  --color-paper-deep: #e9e3d6;
+  --color-paper-edge: #dcd4c3;
+
+  /* Ink */
+  --color-ink: #17140f;
+  --color-ink-raised: #221e17;
+  --color-ink-soft: #4a453b;
+  --color-ink-faint: #7d7464;
+  --color-rule: #d5cdbd;
+
+  /* Accent */
+  --color-vermilion: #d9402a;
+  --color-vermilion-deep: #b32d19;
+  --color-flare: #f26b4e;
+
+  /* On-ink text */
+  --color-chalk: #ede7da;
+  --color-chalk-muted: #a79f8f;
+  --color-rule-dark: #3a3429;
+
+  /* Type */
+  --font-display: var(--font-bricolage), "Helvetica Neue", Helvetica, sans-serif;
+  --font-sans: var(--font-bricolage), "Helvetica Neue", Helvetica, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  --text-display: clamp(2.625rem, 7.4vw, 6rem);
+  --text-display--line-height: 0.9;
+  --text-display--letter-spacing: -0.035em;
+
+  --text-headline: clamp(2.125rem, 5.4vw, 4rem);
+  --text-headline--line-height: 0.96;
+  --text-headline--letter-spacing: -0.035em;
+
+  --text-title: clamp(1.375rem, 2.5vw, 2rem);
+  --text-title--line-height: 1.12;
+  --text-title--letter-spacing: -0.02em;
+
+  --text-lead: clamp(1.0625rem, 1.5vw, 1.3125rem);
+  --text-lead--line-height: 1.55;
+
+  --text-spec: 0.6875rem;
+  --text-spec--line-height: 1.2;
+  --text-spec--letter-spacing: 0.18em;
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* --------------------------------------------------------------------------- */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background-color: var(--color-vermilion);
+  color: var(--color-paper);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-vermilion);
+  outline-offset: 3px;
+}
+
+/*
+ * Ruled inputs keep their own line as the focus indicator instead of a box, so
+ * the form still reads as a printed page rather than a stack of widgets.
+ * This has to live unlayered next to the rule above: `@layer components` loses
+ * to unlayered CSS in the cascade no matter how specific the selector is.
+ */
+.control:focus-visible {
+  outline: none;
+  border-color: var(--color-vermilion);
+  box-shadow: 0 1px 0 0 var(--color-vermilion);
+  background-color: rgba(217, 64, 42, 0.05);
+}
+
+/* Paper grain — kills the sterile flatness of a solid background fill. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.055;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+@layer components {
+  /* Mono spec label — the connective tissue of the whole aesthetic. */
+  .spec {
+    font-family: var(--font-mono);
+    font-size: var(--text-spec);
+    line-height: 1.2;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .rule-top {
+    border-top: 1px solid var(--color-rule);
+  }
+
+  /* Buttons — stamped rectangles, zero radius, editorial authority. */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    height: 3.25rem;
+    padding-inline: 1.75rem;
+    border: 1px solid transparent;
+    border-radius: 0;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition:
+      transform 200ms var(--ease-out-quart),
+      background-color 200ms var(--ease-out-quart),
+      border-color 200ms var(--ease-out-quart),
+      box-shadow 200ms var(--ease-out-quart);
+  }
+
+  .btn-primary {
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+  }
+  .btn-primary:hover {
+    background-color: var(--color-ink-raised);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px -12px rgba(23, 20, 15, 0.6);
+  }
+  .btn-primary:active {
+    transform: translateY(0) scale(0.985);
+    transition-duration: 100ms;
+  }
+
+  .btn-ghost {
+    border-color: var(--color-rule);
+    background-color: transparent;
+    color: var(--color-ink);
+  }
+  .btn-ghost:hover {
+    border-color: var(--color-ink);
+    background-color: rgba(23, 20, 15, 0.04);
+    transform: translateY(-2px);
+  }
+  .btn-ghost:active {
+    transform: translateY(0) scale(0.985);
+    transition-duration: 100ms;
+  }
+
+  .btn-invert {
+    background-color: var(--color-chalk);
+    color: var(--color-ink);
+  }
+  .btn-invert:hover {
+    background-color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px -12px rgba(0, 0, 0, 0.8);
+  }
+  .btn-invert:active {
+    transform: translateY(0) scale(0.985);
+    transition-duration: 100ms;
+  }
+
+  .btn[aria-disabled="true"],
+  .btn:disabled {
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  /* Vermilion rule under a marked word in the hero headline. */
+  .mark {
+    position: relative;
+    display: inline-block;
+  }
+  .mark::after {
+    content: "";
+    position: absolute;
+    left: -0.015em;
+    right: -0.015em;
+    bottom: 0.012em;
+    height: 0.075em;
+    background-color: var(--color-vermilion);
+    transform: scaleX(0);
+    transform-origin: left center;
+    animation: wipe-in 900ms var(--ease-out-expo) 780ms forwards;
+  }
+
+  /* Underline that draws on hover for text links. */
+  .link-draw {
+    position: relative;
+    text-decoration: none;
+  }
+  .link-draw::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.15em;
+    height: 1px;
+    background-color: currentColor;
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 320ms var(--ease-out-expo);
+  }
+  .link-draw:hover::after,
+  .link-draw:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+
+  /* Underline-style form control — a ruled line on a page, not a boxed widget. */
+  .control {
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid var(--color-rule);
+    border-radius: 0;
+    background-color: transparent;
+    padding: 0.625rem 0 0.6875rem;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    color: var(--color-ink);
+    transition:
+      border-color 200ms var(--ease-out-quart),
+      box-shadow 200ms var(--ease-out-quart);
+  }
+  .control::placeholder {
+    color: var(--color-ink-faint);
+  }
+  .control:hover {
+    border-color: var(--color-ink-faint);
+  }
+  .control[aria-invalid="true"] {
+    border-color: var(--color-vermilion-deep);
+  }
+  select.control {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--color-ink) 50%),
+      linear-gradient(135deg, var(--color-ink) 50%, transparent 50%);
+    background-position: right 0.55rem center, right 0.25rem center;
+    background-size: 0.3rem 0.3rem, 0.3rem 0.3rem;
+    background-repeat: no-repeat;
+    padding-right: 1.5rem;
+  }
+  textarea.control {
+    resize: vertical;
+    min-height: 3.25rem;
+  }
+}
+
+/* --- Motion ---------------------------------------------------------------- */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1.35rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes wipe-in {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* Orchestrated page-load entrance. Delay set per element via --delay. */
+.rise {
+  opacity: 0;
+  animation: rise 900ms var(--ease-out-expo) var(--delay, 0ms) forwards;
+}
+
+/* Scroll-triggered reveal, driven by components/scroll-reveal.tsx */
+[data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 1.5rem, 0);
+  transition:
+    opacity 700ms var(--ease-out-expo),
+    transform 700ms var(--ease-out-expo);
+  transition-delay: var(--delay, 0ms);
+}
+[data-reveal][data-visible="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Linear is correct here: a continuously scrolling strip must not ease. */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 42s linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .rise,
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    animation: none;
+    transition: none;
+  }
+  .mark::after {
+    transform: scaleX(1);
+    animation: none;
+  }
+  .marquee-track {
+    animation: none;
+    width: 100%;
+    will-change: auto;
+  }
+  .btn:hover,
+  .btn:active {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-clone {
+    display: none;
+  }
 }
