@@ -42,9 +42,11 @@ Full setup instructions, including Supabase, are in
 
 ## Stack
 
-Next.js (App Router) + TypeScript, Tailwind CSS, Supabase Postgres via Drizzle
-ORM, Zod for validation, Cloudflare R2 for storage. Better Auth and a payment
-provider come later. It is deliberately a boring monolith.
+Implemented: Next.js (App Router) + TypeScript, Tailwind CSS, Postgres through
+Drizzle/postgres.js, and Zod. Better Auth, object storage, payments, shadcn/ui,
+automated tests and deployment are not implemented yet. Supabase Postgres and
+Cloudflare R2 are the preferred managed services; runtime and payment eligibility
+still need verification. It remains a single monolith.
 
 ## Layout
 
@@ -59,6 +61,12 @@ docs                  Architecture, product, decisions (ADRs), status, design
 
 ## Documentation
 
+- [`docs/product/prd.md`](docs/product/prd.md) — master product requirements,
+  first paid-campaign slice, validation experiments and Not Yet scope
+- [`docs/status/roadmap.md`](docs/status/roadmap.md) — dependencies and stage gates
+- [`docs/status/backlog.md`](docs/status/backlog.md) — 48 actual GitHub issues,
+  ordered and classified P0–P3; start with FOUNDATION-001
+- [`CONTEXT.md`](CONTEXT.md) — canonical domain vocabulary
 - [`docs/architecture/overview.md`](docs/architecture/overview.md) — how the app
   is shaped
 - [`docs/decisions/`](docs/decisions/) — ADRs; significant decisions live here
@@ -71,3 +79,8 @@ docs                  Architecture, product, decisions (ADRs), status, design
 
 Documentation must stay true to the code. If you change behaviour, update the
 docs in the same pull request.
+
+The blueprint is proposed for founder review. Its existence does not mean the
+marketplace has been built or that unresolved provider/product decisions are
+approved. [Current state](docs/status/current-state.md) distinguishes code,
+scaffolding, historical verification and open risks.

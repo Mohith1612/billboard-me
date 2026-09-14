@@ -87,7 +87,8 @@ All CSS. No animation library — see ADR-002.
 
 - `--ease-out-expo` `cubic-bezier(0.16, 1, 0.3, 1)` for entrances.
 - `--ease-out-quart` `cubic-bezier(0.25, 1, 0.5, 1)` for hover and press.
-- Only `transform` and `opacity` are animated, so nothing triggers layout.
+- Entrances and the ticker animate `transform` and `opacity`. Controls also
+  transition colors, borders and shadows; `globals.css` records actual behavior.
 
 Three mechanisms:
 
@@ -139,3 +140,18 @@ The site should not drift toward the generic. Concretely: no purple or
 blue-to-purple gradients, no aurora/mesh backgrounds, no uniformly rounded cards,
 no evenly-sized three-card grids, no zero-chroma greys, and no invented logos,
 testimonials or metrics while the numbers are not real.
+
+## Proposed application extension
+
+The [master PRD](../product/prd.md) defines future seller forms and sponsorship
+pages. Reuse this identity with readable mobile terms, visible keyboard focus,
+accessible text alternatives to SVG selection and explicit availability. A
+premium page must help a buyer understand seller, spot, period, deliverables,
+price and next step. Additional motion or a shadcn install is justified only by
+an implemented interaction.
+
+The current plates are marketing illustrations. Their coordinate-derived MM
+labels are not validated print sizes; [template architecture](../architecture/assets-and-surfaces.md)
+separates canonical geometry from measured production dimensions. Future brand
+artwork is reviewed media, not executable seller-supplied SVG. Real trust signals
+need explicit provenance and consent; no fake listings, proof or rating stars.

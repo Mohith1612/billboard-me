@@ -1,77 +1,43 @@
-# Local Development Setup
+# Local development setup
 
-## Prerequisites
-
-- Node.js 22 LTS (or current LTS)
-- pnpm
-- Git
-- GitHub CLI (`gh`) recommended
-- Supabase account
-- Cloudflare account (for R2)
-
-## 1. Clone and install
+Read [AGENTS.md](../../AGENTS.md) and the [agent workflow](agent-workflow.md) first. Audit checks passed using Node **22.14.0** and the repository's **pnpm 10.15.1**. Use the packageManager version from package.json; a consistent runtime pin is planned in FOUNDATION-004. Git and GitHub CLI are useful for the required issue/PR workflow.
 
 ```bash
-git clone <repo-url>
+git clone git@github.com:Mohith1612/billboard-me.git
 cd billboard-me
-pnpm install
-```
-
-## 2. Environment variables
-
-Copy the example file:
-
-```bash
+pnpm install --frozen-lockfile
 cp .env.example .env.local
 ```
 
-Fill in the values (never commit `.env.local`):
+## Current environment contract
 
-```env
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-DATABASE_URL=postgresql://...
-NEXT_PUBLIC_SUPABASE_URL=...
-NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-SUPABASE_SERVICE_ROLE_KEY=...
-# R2 keys added when storage is implemented
-```
+Set `NEXT_PUBLIC_SITE_URL=http://localhost:3000` and a **nonproduction** `DATABASE_URL` for your own disposable/development Postgres instance. Do not print or commit secrets. The example currently includes unused Supabase public/anon/service-role entries and commented R2 entries; **none of those is consumed by the current app**. No Cloudflare or storage account is required to run the landing/waitlist app. FOUNDATION-002 will clean up the example and add validated configuration.
 
-`NEXT_PUBLIC_SITE_URL` is used for canonical URLs, `sitemap.xml` and
-`robots.txt`. It falls back to `http://localhost:3000` when unset.
+The site URL feeds canonical metadata, sitemap and robots and currently falls back to localhost. Next's public environment variables are build-time inputs; deployment must provide a real canonical origin. See installed `node_modules/next/dist/docs/01-app/02-guides/environment-variables.md` before changing configuration behavior.
 
-## 3. Database
+Drizzle CLI currently reads `.env.local` with dotenv and uses DATABASE_URL; the app reads the same variable through Next. There is no enforced separation of migration/test/runtime URLs yet. Verify the selected target is nonproduction before running migrations or Studio. The client disables prepared statements; confirm direct versus session/transaction-pooler connection requirements using [Supabase connection guidance](https://supabase.com/docs/guides/database/connecting-to-postgres). Connection string, role and deployment assumptions are not proven merely by the client constructor.
 
-We use Drizzle ORM with Supabase Postgres.
+## Database and run
 
-Apply the existing migrations before running the app, otherwise waitlist
-submissions will fail to save:
+For your isolated development database, apply existing migrations before testing persistence:
 
 ```bash
 pnpm db:migrate
-```
-
-Available scripts:
-
-| Script | Does |
-| --- | --- |
-| `pnpm db:generate` | Generate a migration from `src/lib/db/schema.ts` |
-| `pnpm db:migrate` | Apply pending migrations |
-| `pnpm db:studio` | Browse the data — this is how you read waitlist entries |
-
-Generated SQL lives in `drizzle/`. Never edit a migration that has already been
-applied, and commit `drizzle/meta` along with the SQL: drizzle-kit uses it to
-diff the next schema change.
-
-## 4. Run the development server
-
-```bash
 pnpm dev
 ```
 
-## 5. Project conventions
+The only migration is `drizzle/0000_clammy_ma_gnuci.sql`, creating the seller and brand waitlists. PR #2 reports applying it to its development DB, not yours. Commit newly generated SQL and Drizzle metadata together; never edit applied migrations. `pnpm db:generate` generates migrations from schema, and `pnpm db:studio` inspects the database. There is no lead-review dashboard or notification service today.
 
-- Read `AGENTS.md` before any work
-- Follow the agent workflow in `docs/development/agent-workflow.md`
-- All changes go through issues + PRs
-- Documentation must stay in sync with code
+Open localhost:3000. Current routes are `/`, `/waitlist/seller`, `/waitlist/brand` and `POST /api/waitlist`, plus generated metadata routes. Valid waitlist submissions write real rows to the configured development DB; use synthetic addresses and clean up only your test fixtures.
+
+## Checks
+
+```bash
+pnpm lint
+pnpm typecheck
+pnpm build
 ```
+
+There is no automated test command yet. [Testing](testing.md) specifies FOUNDATION-003/004 and later integration expectations. A fresh typecheck may need Next-generated route types; the CI issue must make that sequence reproducible. Build fetches next/font resources when they are not cached. Neither successful build nor typecheck proves remote DB connectivity, grants or production deployment.
+
+Future auth/provider/storage/email environment variables belong in the example only when their corresponding integration lands. Keep test/preview/prod connections, buckets and provider modes separate; no real recipients or financial credentials in automated fixtures.

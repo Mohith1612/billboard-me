@@ -1,0 +1,11 @@
+# ADR-003: Versioned inventory and independent transaction lifecycles
+
+**Date:** 2026-09-14. **Status:** Proposed — founder approval required before domain implementation. **Planning issue:** [#3](https://github.com/Mohith1612/billboard-me/issues/3).
+
+The original User → Asset → Template → Surface → Spot → Listing → Offer/Order → Campaign → Proof → Payout chain names useful concepts but cannot express reusable templates, repeated time-based sales, changing negotiations or asynchronous money movement. Treat it as a vocabulary, not an ownership hierarchy.
+
+Propose reusable immutable template versions with surface/spot definitions, seller-owned assets and instantiated inventory spots. A sponsorship page groups time-bounded listings. An accepted asking-price request or negotiated offer produces one order with frozen terms and one exclusive spot reservation. A funded order produces one campaign. Payment, proof review and seller settlement have separate records and states. One order buys one spot/period in INR for the pilot; no generalized basket or bundles.
+
+This costs a few explicit relationships and requires database concurrency controls, but prevents editing a template or listing from rewriting a sold deal and prevents payment retries from duplicating campaigns. Alternatives rejected: one mutable listing row for the whole transaction (loses history and conflates states); one copied template per seller (drifts geometry); a generalized multi-seller cart/event-sourced ledger (unnecessary for first campaigns). Activity records provide an audit trail without making event sourcing the storage model.
+
+The [database proposal](../architecture/database.md) and [lifecycle](../architecture/transaction-lifecycle.md) specify constraints. ADR-001 remains accepted for architecture and the two-type wedge; this proposal refines relationships without expanding public access. No schema changes are made by this ADR. Acceptance does not approve a payment provider or funds-holding arrangement.
