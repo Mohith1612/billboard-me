@@ -4,13 +4,13 @@
 
 ## What exists and what to retain
 
-`src/lib/db/schema.ts` defines only `seller_waitlist` and `brand_waitlist`. Both have UUID primary keys, required name/email fields, optional plain-text lead qualifiers, and `timestamptz created_at`. `drizzle/0000_clammy_ma_gnuci.sql`, its journal and snapshot agree on these two tables. There are no domain tables, foreign keys, secondary indexes, RLS policies, explicit grants or financial records.
+`src/lib/db/schema.ts` defines only `seller_waitlist` and `brand_waitlist`. Both have UUID primary keys, required name/email fields, optional plain-text lead qualifiers, and `timestamptz created_at`. `drizzle/0000_clammy_ma_gnuci.sql` creates them; `0001_many_vector.sql` enables RLS and revokes all table privileges from `anon` and `authenticated`. The journal and snapshots agree with both migrations. There are no domain tables, foreign keys, secondary indexes, RLS policies or financial records. The absence of client policies is deliberate: waitlist leads have no direct browser database path.
 
 Keep these lead tables outside the marketplace model. Their free-text category answers must not become an inventory enum. Keep generated migration history intact. PR #2 reports applying migration 0000 to its development database; this audit did not inspect any database or prove application in other environments.
 
-The server imports a module-level `postgres()` client with `prepare: false`, wrapped by Drizzle. It reads `DATABASE_URL!` without runtime validation. No Supabase browser client exists. Disabling prepared statements is consistent with transaction-pooler constraints, but the actual connection mode, role, TLS, pool size and deployment lifetime remain unverified. [Supabase connection guidance](https://supabase.com/docs/guides/database/connecting-to-postgres).
+The server imports a module-level `postgres()` client with `prepare: false`, wrapped by Drizzle. The module imports `server-only`, so Next.js rejects a client module that imports it. It reads `DATABASE_URL!` without runtime validation. No Supabase browser client exists. Disabling prepared statements is consistent with transaction-pooler constraints, but the actual connection mode, role, TLS, pool size and deployment lifetime remain unverified. [Supabase connection guidance](https://supabase.com/docs/guides/database/connecting-to-postgres).
 
-**First correction:** explicitly protect lead data against direct client access. The migration snapshot says RLS is disabled; actual exposure also depends on schema exposure and grants. In a new migration, establish deny-by-default client roles/RLS and the required server permissions; test `anon`, `authenticated` and the app role in a disposable database. Verify deployed configuration separately. This is a demonstrated missing control, not proof of a live leak. [Supabase RLS guidance](https://supabase.com/docs/guides/database/postgres/row-level-security).
+**Implemented correction:** migration 0001 establishes deny-by-default access for the two lead tables with RLS plus explicit client-role revokes. `tests/db/waitlist-access.sql` and its Docker runner assert effective CRUD denial for `anon` and `authenticated`, preservation of pre-migration rows, and inserts through a narrowly granted disposable `BYPASSRLS` server role. The runner also posts representative seller and brand payloads through the real Next.js route. This proves repository behavior on disposable PostgreSQL, not which migrations, schemas, grants or connection role are deployed. [Supabase RLS guidance](https://supabase.com/docs/guides/database/postgres/row-level-security).
 
 ## Proposed entities
 
@@ -64,6 +64,8 @@ Transactions/events are idempotent at business level. Provider-specific idempote
 ## Access, retention and migrations
 
 Better Auth is not Supabase Auth; its session user does not automatically populate `auth.uid()` or a PostgREST JWT. The intended path is browser → Next.js authorized operation → Drizzle → Postgres, with no public Data API access to private tables. Prove role grants/RLS and explicit server owner checks; never assume hiding a button or adding proxy redirects secures an operation.
+
+For the current waitlist route, `DATABASE_URL` must identify a server-only role that can insert and bypass RLS (the table owner, a superuser, or a narrowly granted `BYPASSRLS` role). That bypass is infrastructure authority, not end-user authorization, and its credentials must never enter the browser. FOUNDATION-002 still owns validating and narrowing the actual deployed connection role.
 
 Use separate app and migration credentials where the runtime supports it. Migration owner may create schema; app role has only required runtime permissions; clients have no direct grants to lead, auth, financial or proof data. Document any RLS bypass for the server role and test ownership in application operations. Do not use production credentials to run development, tests or previews.
 

@@ -22,7 +22,7 @@ export const sellerWaitlist = pgTable("seller_waitlist", {
   audienceReach: text("audience_reach"),
   eventContext: text("event_context"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}).enableRLS();
 
 export const brandWaitlist = pgTable("brand_waitlist", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -34,4 +34,4 @@ export const brandWaitlist = pgTable("brand_waitlist", {
   budgetRange: text("budget_range"),
   campaignTiming: text("campaign_timing"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}).enableRLS();

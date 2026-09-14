@@ -4,7 +4,7 @@
 
 ## Start here
 
-**Next coding agent: [FOUNDATION-001 — Enforce server-only waitlist data access (#4)](https://github.com/Mohith1612/billboard-me/issues/4).** The existing migration does not establish private lead access. Fix and test the server/client data boundary before adding more private tables. This has no unimplemented product dependency; its acceptance establishes a reproducible access-control baseline. Preserve migration 0000 and current waitlist behavior. Next in this lane: [FOUNDATION-002 (#5)](https://github.com/Mohith1612/billboard-me/issues/5), then test harness and CI.
+**Current coding issue: [FOUNDATION-001 — Enforce server-only waitlist data access (#4)](https://github.com/Mohith1612/billboard-me/issues/4).** Its implementation establishes and tests the server/client data boundary while preserving migration 0000 and waitlist behavior. It still requires human review and merge. After that dependency is merged, [FOUNDATION-002 (#5)](https://github.com/Mohith1612/billboard-me/issues/5) is next in this lane, followed by the broader test harness and CI.
 
 In parallel, founder runs seller/buyer matching ([#9](https://github.com/Mohith1612/billboard-me/issues/9)), physical rights/production trial ([#10](https://github.com/Mohith1612/billboard-me/issues/10)) and provider eligibility ([#11](https://github.com/Mohith1612/billboard-me/issues/11)). These are evidence/decision work, not three product-feature teams. Existing lead protection need not wait for demand validation.
 

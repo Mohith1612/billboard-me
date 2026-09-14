@@ -18,7 +18,7 @@ you are a person or a coding agent.
 ```bash
 pnpm install
 cp .env.example .env.local   # then fill in the values
-pnpm db:migrate              # creates the waitlist tables
+pnpm db:migrate              # creates and protects the waitlist tables
 pnpm dev
 ```
 
@@ -36,6 +36,8 @@ Full setup instructions, including Supabase, are in
 | `pnpm start` | Serve the production build |
 | `pnpm lint` | ESLint |
 | `pnpm typecheck` | `tsc --noEmit` |
+| `pnpm test:client-boundary` | Prove the database module cannot enter a client bundle |
+| `pnpm test:db:waitlist` | Verify waitlist grants, RLS, migrations, and route persistence in Docker |
 | `pnpm db:generate` | Generate a Drizzle migration from the schema |
 | `pnpm db:migrate` | Apply pending migrations |
 | `pnpm db:studio` | Browse the database (this is how you read waitlist entries) |
@@ -44,7 +46,8 @@ Full setup instructions, including Supabase, are in
 
 Implemented: Next.js (App Router) + TypeScript, Tailwind CSS, Postgres through
 Drizzle/postgres.js, and Zod. Better Auth, object storage, payments, shadcn/ui,
-automated tests and deployment are not implemented yet. Supabase Postgres and
+general application tests, CI, and deployment are not implemented yet. Targeted
+shell/SQL checks cover the waitlist data boundary. Supabase Postgres and
 Cloudflare R2 are the preferred managed services; runtime and payment eligibility
 still need verification. It remains a single monolith.
 

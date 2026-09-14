@@ -5,7 +5,7 @@
 ## Pick up a task
 
 1. Read AGENTS.md fully, [current state](../status/current-state.md), the issue and its linked dependencies. Read relevant PRD sections, domain glossary, architecture and accepted/proposed ADR status. Inspect actual code; do not infer implementation from paths.
-2. Verify dependencies are human-merged/accepted with evidence. The [backlog](../status/backlog.md) is topologically ordered and the [roadmap](../status/roadmap.md) shows independent lanes. Start with FOUNDATION-001 for the first coding task.
+2. Verify dependencies are human-merged/accepted with evidence. The [backlog](../status/backlog.md) is topologically ordered and the [roadmap](../status/roadmap.md) shows independent lanes. FOUNDATION-001 is the current coding task; FOUNDATION-002 starts only after it is human-merged.
 3. Update the existing issue with investigation and actual affected files; create a new issue only for genuinely new scope. Every planned issue has Problem, Context, Dependencies, Scope, Out of scope, Proposed implementation, Files/components likely affected, Acceptance criteria, Tests required, Documentation required, Risks and Notes.
 4. Create a dedicated branch (`fix/foundation-001-waitlist-access`, for example). Use a separate worktree for each simultaneously coding agent. Record issue owner, touched modules, shared files, prerequisite branches and intended merge order in the issue before parallel changes.
 5. Implement only that issue using existing modules and installed version documentation. When schema/auth/payment/state contracts need a change, coordinate with their current owner first. Return unresolved product decisions to the founder in the issue with concrete options/evidence; continue unrelated authorized work.
