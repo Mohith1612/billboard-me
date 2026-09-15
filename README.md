@@ -5,7 +5,10 @@ occupy spaces that others look at — a MacBook lid, a jersey, a T-shirt — and
 those surfaces can be sold as advertising spots.
 
 The product is invite-only and high-touch right now. The public site is a landing
-page and two waitlist forms; everything else is recruited and closed by hand.
+page and two waitlist forms; seller recruitment is manual and no completed paid
+campaign is established by the repository. The planned marketplace facilitates
+transactions; sellers own physical fulfillment. Provider settlement and campaign
+evidence are independent, with explicit party obligations and support policies.
 
 ## Read this first
 
@@ -74,8 +77,9 @@ docs                  Architecture, product, decisions (ADRs), status, design
   first paid-campaign slice, validation experiments and Not Yet scope
 - [`docs/status/roadmap.md`](docs/status/roadmap.md) — dependencies and stage gates
 - [`docs/status/backlog.md`](docs/status/backlog.md) — 48 actual GitHub issues,
-  ordered and classified P0–P3; FOUNDATION-001 and FOUNDATION-002 are done,
+  ordered and classified P0–P3; FOUNDATION-001 and FOUNDATION-002 are merged,
   FOUNDATION-003 is next
+- [`docs/status/product-model-reconciliation.md`](docs/status/product-model-reconciliation.md) — marketplace responsibility changes and all 48 issue dispositions
 - [`CONTEXT.md`](CONTEXT.md) — canonical domain vocabulary
 - [`docs/architecture/overview.md`](docs/architecture/overview.md) — how the app
   is shaped

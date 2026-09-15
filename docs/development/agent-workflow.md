@@ -5,7 +5,7 @@
 ## Pick up a task
 
 1. Read AGENTS.md fully, [current state](../status/current-state.md), the issue and its linked dependencies. Read relevant PRD sections, domain glossary, architecture and accepted/proposed ADR status. Inspect actual code; do not infer implementation from paths.
-2. Verify dependencies are human-merged/accepted with evidence. The [backlog](../status/backlog.md) is topologically ordered and the [roadmap](../status/roadmap.md) shows independent lanes. FOUNDATION-001 is the current coding task; FOUNDATION-002 starts only after it is human-merged.
+2. Verify dependencies are human-merged/accepted with evidence. The [backlog](../status/backlog.md) is topologically ordered and the [roadmap](../status/roadmap.md) shows independent lanes. FOUNDATION-001 and FOUNDATION-002 merged in PR #53 and PR #54. FOUNDATION-003 (#6) is next; extend the existing environment, client-boundary and waitlist checks into the general test harness.
 3. Update the existing issue with investigation and actual affected files; create a new issue only for genuinely new scope. Every planned issue has Problem, Context, Dependencies, Scope, Out of scope, Proposed implementation, Files/components likely affected, Acceptance criteria, Tests required, Documentation required, Risks and Notes.
 4. Create a dedicated branch (`fix/foundation-001-waitlist-access`, for example). Use a separate worktree for each simultaneously coding agent. Record issue owner, touched modules, shared files, prerequisite branches and intended merge order in the issue before parallel changes.
 5. Implement only that issue using existing modules and installed version documentation. When schema/auth/payment/state contracts need a change, coordinate with their current owner first. Return unresolved product decisions to the founder in the issue with concrete options/evidence; continue unrelated authorized work.
@@ -39,6 +39,7 @@ Handoff includes: exact issue/branch/commit, dependency state, changed files, re
 | design/design-system.md | Current design intent and future product extension | UI/design work; CSS is actual token implementation |
 | status/current-state.md | Verified implementation and audit evidence limits | Actual shipped/verified state changes |
 | status/known-issues.md | Open gaps and owner issues | Discovery/resolution of real gaps |
+| status/product-model-reconciliation.md | PLAN-002 change rationale and disposition of all 48 original issues | Marketplace responsibility/settlement reconciliation; historical comparison, not another PRD |
 | status/roadmap.md, backlog.md | Stages, dependency graph and issue navigation | Ordering, gate or dependency changes |
 | GitHub issues | Bounded implementation/evidence acceptance and progress | Before/during/after task; link PR |
 | development/testing.md, operating-first-campaign.md | Verification and founder-run release/campaign operations | Testing/release/support changes |

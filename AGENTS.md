@@ -8,7 +8,7 @@ This is the single source of truth for every coding agent working on this reposi
 
 ## 1. Product Summary
 
-Billboard.me is a marketplace for physical advertising inventory.
+Billboard.me is marketplace and transaction infrastructure for physical sponsorship inventory. Sellers own listing accuracy, rights and fulfillment; sponsors evaluate and purchase; Billboard.me operates the platform, payments, records and support. Curation does not guarantee physical performance.
 
 Core insight: People already own physical objects and occupy physical spaces that others see. Those surfaces can be sold as advertising spots.
 
@@ -17,7 +17,8 @@ Core insight: People already own physical objects and occupy physical spaces tha
 - Only two asset types exposed: MacBook and Jersey/T-shirt
 - Public site is only a landing page + waitlist forms
 - Real sellers are recruited manually by the founder
-- Success metric = closed paid campaigns with proof and payout
+- Success metric = completed paid campaigns with attributed sponsor-reviewed evidence and successful provider settlement; these outcomes do not prescribe settlement order
+- Normal marketplace settlement is the proposed default, independent of proof; no mandatory founder fulfillment verdict or payout-release gate. Provider/legal/policy choices still require recorded validation and founder approval
 
 This describes the implemented public scope. The staged product plan is in
 [`docs/product/prd.md`](docs/product/prd.md); future approved sponsorship pages
@@ -110,6 +111,8 @@ schema or lifecycle work, read [`CONTEXT.md`](CONTEXT.md),
 [`docs/architecture/database.md`](docs/architecture/database.md), and
 [`ADR-003`](docs/decisions/ADR-003-inventory-and-transaction-boundaries.md).
 The refined relationships remain proposed until the founder approves DOMAIN-001.
+Read [ADR-005](docs/decisions/ADR-005-marketplace-responsibility-and-settlement-model.md)
+for the founder-directed marketplace responsibility boundary and independent settlement model.
 
 ---
 

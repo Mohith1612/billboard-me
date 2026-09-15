@@ -8,7 +8,7 @@ Use verified email for buyers; a person may also become an approved seller. Foun
 
 Invitations store issuer, email, token hash, expiry and redeemed/revoked state; redemption is atomic, one use and email-bound. Login links use the library's short-lived single-use verification and supported secure token storage. Restrict return URLs to internal paths; retain chosen spot through login. Rate-limit sending/redemption with a simple host/database mechanism; secure cookies and trusted origins. Add one mail provider/test sink; no test mail to real waitlist contacts.
 
-Seller suspension blocks new business while preserving paid obligations and support. Founder sessions need verified identity and a supported second factor before money-release/refund authority; recovery is a documented operator procedure. Provider dashboard access also requires its own protected account.
+Seller suspension blocks new business while preserving paid obligations and support. Founder sessions need verified identity and a supported second factor before financial adjustment/refund authority (normal settlement has no founder release gate); recovery is a documented operator procedure. Provider dashboard access also requires its own protected account.
 
 Authorize in domain operations and safe reads using actor and resource owner/participant. Layouts and `proxy.ts` are UX only. Read installed Next.js `01-app/02-guides/authentication.md` and `data-security.md`; avoid obsolete middleware conventions. Better Auth IDs do not automatically populate Supabase `auth.uid()`. Use server-owned Postgres access unless a supported identity integration is deliberately approved.
 

@@ -9,7 +9,7 @@
 | Public visitor | Read approved public page projection; cannot inspect offers/orders/evidence |
 | Verified buyer | Create own request/offer; respond to seller counters; pay own order; view own campaign/proof; raise issue |
 | Approved seller | Manage own drafts/inventory; accept/reject/counter incoming proposals; prepare/execute own campaign; submit proof |
-| Operator | Approve/suspend supply; record manual checks, creative readiness, proof review and commercial resolution; approve refund/release |
+| Operator | Approve/suspend supply with stated check scope; support participants, preserve evidence, facilitate resolution; authorize policy/provider-permitted financial remedies |
 | Payment provider | Supplies authoritative payment, refund, transfer and settlement outcomes through verified API/events |
 | Reconciler | Executes bounded authorized expiry/retry/reconciliation work; cannot invent payment or proof success |
 
@@ -38,11 +38,11 @@ An asking-price request is an offer at list price; seller acceptance records agr
 
 ## Orders, reservations and payment
 
-Recommended business order states: `awaiting_payment`, `funded`, `cancelled`, `closed`. Use separate payment/refund/dispute state to explain what happened; do not add every combination to one enum. `closed` means commercial work is resolved, including a cancelled/refunded case, and does not imply a successful campaign. Normal closure follows campaign completion and settlement reconciliation.
+Recommended business order states: `awaiting_payment`, `funded`, `cancelled`, `closed`. Use separate payment/refund/dispute state to explain what happened; do not add every combination to one enum. `closed` means commercial work is resolved, including a cancelled/refunded case, and does not imply a successful campaign. Normal successful closure follows attributed campaign completion and settlement reconciliation, in either sequence. Unresolved support may be administratively closed with an explicit unresolved outcome; that is not campaign success.
 
 | Transition/event | Actor | Required behavior |
 | --- | --- | --- |
-| Accepted offer → awaiting_payment + held reservation | Acceptance operation | Atomic snapshot of spot/period/template/page claims/price/fee/deliverables/terms and both acceptance identities; payment deadline capped by preparation lead time |
+| Accepted offer → awaiting_payment + held reservation | Acceptance operation | Atomic snapshot of spot/period/template/page claims/price/fee/deliverables, seller/sponsor responsibilities, evidence and settlement policies/terms and both acceptance identities; payment deadline capped by preparation lead time |
 | Create checkout attempt | Buyer/server | Recheck seller payment eligibility, active hold, currency/amount; persist operation key/provider order association before redirect; one intended payable amount |
 | Payment authorized | Provider | Record authorization; order remains unfunded until capture confirmed. Do not leave authorization open until proof |
 | Payment fails/cancels | Provider or verified API result | Mark attempt failed; keep order retryable until deadline. Another attempt may be created under the same order; do not create another campaign |
@@ -55,48 +55,63 @@ Recommended business order states: `awaiting_payment`, `funded`, `cancelled`, `c
 
 P0 defaults proposed in the PRD: 48-hour offer response, 24-hour payment deadline. Operator may choose shorter near-term periods before acceptance, but cannot extend an expired deal without revalidation and explicit new terms. The hold deadline is not the campaign end. Scheduled reconciliation can run inside the monolith via the selected host's scheduler; a reliable operator-triggered sweep is a P0 fallback, with expiry also checked on every acceptance/payment attempt. No Redis lock service.
 
+## Independent states
+
+| Record | Minimal states / facts | Authority and independence |
+| --- | --- | --- |
+| Order | awaiting_payment / funded / cancelled / closed; closure reason | Agreement container; cancellation or closure is not a refund or proof of performance |
+| Payment attempt | created / pending / authorized / captured / failed / cancelled / unknown | Verified provider event/query; capture funds order, browser redirect does not |
+| Seller allocation / settlement | allocation pending/confirmed/failed/unknown; bank settlement pending/succeeded/failed/unknown/reversed/provider_restricted | Provider normal schedule; no campaign/proof prerequisite; failed bank settlement does not erase execution |
+| Campaign | scheduled / in_progress / fulfillment_reported / completed / cancelled; exception reason and actual dates | Seller reports performance; sponsor acknowledges completion; party-agreed resolution records basis. Time passing is not completion |
+| Evidence | submitted / acknowledged / clarification_requested / contested; optional not_required/not_submitted projection | Requirement comes from frozen terms; sponsor responds; operator checks are attributed, never automatic physical truth |
+| Support dispute | open / awaiting_party / escalated / resolved / closed_unresolved | Party complaint and facilitated resolution; no automatic settlement freeze |
+| Provider dispute | Provider-specific open/won/lost/closed plus response deadline | Provider/network owns financial outcome; do not map support closure to chargeback success |
+
+Expose these as separate panels, not a cross-product enum. A settled-but-unfulfilled order and a completed-but-unsettled campaign are valid exception cases. Financial reporting cannot derive settlement from campaign state.
+
 ## Campaign execution and proof
 
-| From → to | Actor | Required behavior |
+| From → to / event | Actor | Required behavior |
 | --- | --- | --- |
-| Funded order → scheduled/preparing | Confirmed payment handler | Idempotent campaign creation, frozen deliverables and dates, named responsible operator |
-| preparing → ready | Operator after buyer creative approval and seller confirmation | Record actual creative version, fit/printing/application/shipping readiness; initial rights/exclusivity still valid |
-| ready → in_progress | Seller/operator, at agreed start | Start time and evidence of application; payment confirmed; no silent substitution of asset or sponsor |
-| preparing/ready → exception | Deadline missed/event changed | Record issue; notify parties; cancel/refund or explicitly agree revised terms and recheck reservation; do not start late by default |
-| in_progress → awaiting_proof | End of execution or seller completion | Record actual dates and required remaining evidence; reaching scheduled end does not complete the campaign |
-| awaiting_proof → under_review | Seller | Submit private validated files/links plus checklist; preserve submit time and claimed capture time separately |
-| under_review → awaiting_proof | Operator requests changes | Required reason and missing deliverables; original evidence retained; revised deadline mutually clear |
-| under_review → completed | Operator | Criteria satisfied, buyer acknowledged or review window/escalation resolved manually; approval evidence and timestamp; no blocking dispute |
-| Any active state → cancelled | Operator per accepted policy | Execution stops; refund/financial resolution tracked separately; proof/archive retained; inventory release depends on actual ongoing placement/removal |
+| Funded order → scheduled | Confirmed payment handler | Idempotent one-campaign creation, frozen dates/deliverables, seller fulfillment owner and party obligations; no required operator production role |
+| Preparation or material change message | Seller/buyer | Record private timestamped message, agreed creative reference, sender and requested response; notify the other party. Seller arranges production unless terms explicitly assign it elsewhere |
+| scheduled → in_progress | Seller, at agreed start | Record claimed start; payment confirmed; creative/rights obligations still apply; report exceptions rather than imply platform inspection |
+| Active → exception notice | Seller/participant or overdue sweep | Event/date change, missed preparation or nonattendance becomes visible; notify parties. Any amendment requires both parties and a new availability check |
+| scheduled/in_progress → fulfillment_reported | Seller | Claim performance with actual dates/context; state evidence remaining under accepted terms |
+| Evidence submitted/revised | Seller | Private notes/HTTPS references in P0; preserve prior submissions and claimed capture versus submit time. Native files only when MEDIA-001 is implemented |
+| Evidence → acknowledged / clarification_requested / contested | Sponsor | Append attributed response against deliverables. Seller cannot acknowledge on sponsor’s behalf; explanations/resubmissions retained |
+| fulfillment_reported → completed | Sponsor acknowledgement, or documented party-agreed resolution | Record completion basis/actor/time; unresolved fulfillment complaint cannot be disguised as verified success. Evidence requirement is per terms; strongest metric requires acknowledged evidence |
+| Active → cancelled | Authorized party/operator under accepted policy | Record reason and notification; refund/recovery separate; release inventory only when actual placement/removal permits |
+| Sponsor silence / overdue evidence | Reminder/reconciler/operator support | Flag overdue/unconfirmed, follow approved support window. Never assume verification, guaranteed remedy or permission to hold normal settlement |
 
-An overdue campaign or proof submission becomes an operator task/exception; it is never automatically counted as complete. Buyer silence at 72 hours escalates to founder review, not automatic proof approval. Suspected fraud, disallowed content, event cancellation or failure to remove old branding blocks completion/rebooking as appropriate. Supporting a timestamped exception/reason is sufficient; a configurable workflow engine is not.
+Founder may facilitate evidence review and record scoped observations, but does not have a required “approve fulfillment then release money” command. No realtime chat, project workflow engine or automatic fraud verdict. External links may expire: retain review summary and references, and obtain an approved secure original-evidence process if required by the contract/provider. No arbitrary server URL fetching or automatic public proof publication.
 
-## Refunds, disputes and payouts
+## Refunds, disputes and normal settlement
 
 | Event | Authority and required handling |
 | --- | --- |
-| Seller rejects before acceptance | Recipient closes offer; no order or charge |
-| Buyer withdraws before acceptance | Sender closes offer; no charge |
-| Buyer cancels unpaid order | Buyer/server cancels eligible order, confirms no unresolved capture, releases hold; late capture handling still applies |
-| Seller cannot fulfill paid order | Operator records cause; agreed policy normally leads to refund or buyer-approved reschedule; never force a credit wallet |
-| Buyer cancels funded order | Operator evaluates accepted cancellation terms and production costs; creates approved full/partial refund request; preserve decision and buyer notice |
-| Event cancelled/rescheduled | Operator checks new date/rights/availability with both parties; explicit amendment or replacement order with audit trail; original payment/terms retained |
-| Proof disputed/rejected | Freeze unreleased seller settlement; request new proof or decide refund/resolution against agreed deliverables |
-| Refund requested/submitted/pending/succeeded/failed/unknown | Operator authorizes amount; provider confirms outcome. Sum pending/succeeded refund amounts cannot exceed captured funds. Failure/unknown is a visible unresolved task |
-| Refund after seller allocation | Provider-specific linked transfer reversal/recovery; record reversal separately. Do not assume refund automatically recovers seller money |
-| Refund after payout | Provider-approved recovery/funding process; no assumption of future seller earnings. Record unrecovered exposure and operator decision |
-| Buyer opens provider dispute/chargeback | Verified provider event creates/updates dispute; track evidence deadline; freeze further release where permitted; operator submits existing evidence; provider outcome authoritative |
-| Proof approved and campaign completed | Compute payout eligibility from captured money, fee/cost snapshot, completed proof, account capability and no blocking dispute; operator approves release |
-| Transfer/release requested | Durable unique operation; provider holds/releases according to approved agreement; request success is not bank success |
-| Bank settlement pending/succeeded | Reconcile provider settlement and allocation amounts, bank reference and order; only succeeded qualifies for north star |
-| Bank settlement failed/unknown | Record reason, notify operator/seller, remediate provider onboarding/bank state; reconcile before controlled retry; do not mark campaign unexecuted |
-| Bank settlement reversed after success | Reopen financial exception; adjust current successful-campaign count; retain original success and reversal history |
+| Offer rejected/withdrawn/expired before acceptance | Close proposal; no charge or reservation |
+| Unpaid order cancelled | Authorized buyer/server confirms no unresolved capture, releases inventory hold; late capture safeguards remain |
+| Seller cannot fulfill / does not attend | Seller responsibility; preserve notices and evidence. Facilitate agreed cancellation/reschedule/remedy under terms; not an automatic platform failure or guaranteed refund. Existing statutory/provider rights remain |
+| Buyer cancels funded order | Apply accepted policy with authorized actor, reason, production-cost treatment and party notice; policy eligibility is separate from successful financial refund |
+| Event cancelled/rescheduled | Obtain explicit party amendment or replacement agreement; recheck rights/availability; retain original terms and payment history |
+| Evidence contested / parties disagree | Open support case; gather terms, messages and both accounts; request clarification. Facilitate agreement or authorized policy remedy; allow unresolved/escalated closure without declaring contested facts true |
+| Refund requested/submitted/pending/succeeded/failed/unknown | Authorized policy action; provider confirms. Sum pending/succeeded amounts cannot exceed captured funds; failed/unknown remains visible. No promise of automatic approval or guaranteed recovery |
+| Refund after seller allocation/settlement | Track buyer refund and provider reversal/recovery separately. Confirm who funds it and unrecovered exposure if seller balance is insufficient; never assume future earnings |
+| Provider dispute/chargeback | Verified event/query; retain response deadline and evidence; use actual permitted provider restrictions and financial remedy. Provider/network outcome is authoritative for financial state |
+| Payment captured, fee/share allocated | Provider or durable server operation, according to approved adapter |
+| Normal seller settlement | Reconcile amount allocated to each order, provider settlement/bank reference and failure/reversal status. It may occur before the event, before evidence or during support review; there is no founder proof/release check |
+| Provider KYC/risk restriction | Record actual provider reason/status and required remediation. Do not label it “awaiting proof” or claim the app can remove it |
+| Failed/unknown settlement | Alert seller/operator, query provider before retry, remediate account/bank requirements; preserve completed physical work |
+| Settlement reversed after success | Retain original history, reopen financial exception, adjust current qualified success count |
 
-Refund and release can race. Lock order financial eligibility before queuing either operation; recheck open disputes and refund intents before release submission, and reconcile already submitted provider operations. If the provider settles automatically before proof, the approved product policy must reflect that; the application cannot guarantee a hold by hiding a release button.
+PaymentService allocates seller share if required by the provider's ordinary flow; this is deterministic financial processing, not discretionary fulfillment approval. No mandatory hold/release capability. Optional delayed settlement requires a separately approved contract and provider capability, outside current P0.
+
+Refund operations and external settlement can race. Lock/refund-cap amount intentions in the database, persist unique operation keys and reconcile submitted operations, but do not claim a local lock can stop provider bank settlement. A support complaint does not universally freeze funds. Confirm provider/account loss responsibility before live collection. A non-guarantee product boundary is not an exemption from legal, platform-error or payment-provider obligations.
 
 ## Minimal cancellation policy to approve
 
-Before checkout ships, founder publishes a versioned policy covering: unpaid expiry; buyer withdrawal; seller nonperformance; event cancellation; costs after creative/production approval; partial fulfillment; unacceptable proof and cure period; buyer nonresponse; support window; provider dispute deadlines; post-payout recovery; tax/fee treatment on refund. Store the policy version and actual agreed exceptions in the order. No legal defaults are invented by this blueprint.
+Before checkout ships, founder publishes a versioned policy covering: unpaid expiry; buyer withdrawal; seller nonperformance; event cancellation; costs after creative/production approval; partial fulfillment; contested or missing agreed evidence and cure period; buyer nonresponse; support window; provider dispute deadlines; post-payout recovery; tax/fee treatment on refund. Also specify seller/sponsor/platform obligations, support authority versus factual adjudication, normal settlement timing, optional evidence, no-response treatment, and any provider-mandated restriction. Store the policy version and actual agreed exceptions in the order. No legal defaults are invented by this blueprint.
 
 ## Required adversarial tests
 
@@ -104,7 +119,8 @@ Before checkout ships, founder publishes a versioned policy covering: unpaid exp
 - Double-click/replayed acceptance yields the same order; accepting a stale counter fails; self-acceptance/foreign-order access fails.
 - Payment success before checkout response, webhook duplicate, reversed event order, missed webhook, invalid signature, unknown timeout, late capture after hold release and amount mismatch all preserve one funded order/campaign.
 - Seller suspension, page edit/unpublish or template version addition does not erase or alter a paid contract.
-- Private evidence cannot be read across orders; resubmission retains prior review; rejected proof cannot release funds.
-- Concurrent refund/release, partial refund cap, unknown payout retry and successful-then-reversed settlement preserve correct amounts and auditable outcomes.
+- Private evidence/messages cannot be read across orders; revisions retain attributed responses; seller self-acknowledgement fails. Evidence changes have no settlement side effect.
+- Normal settlement succeeds before campaign/evidence completion; evidence can be acknowledged while settlement fails. Nonattendance after settlement opens a case without erasing financial facts or guaranteeing recovery.
+- Refund/settlement race, partial refund cap, unknown payout retry and successful-then-reversed settlement preserve correct amounts and auditable outcomes. Sponsor silence and operator unresolved closure cannot increment verified success.
 
 The financial adapter, operator screens and tests must implement this same authority model. Manual operations reduce UI scope; they do not reduce evidence or money correctness requirements.

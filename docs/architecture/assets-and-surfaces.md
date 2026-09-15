@@ -12,6 +12,6 @@ Manifest fields: template key/version, family/variant, viewBox, renderer referen
 
 Renderer inputs: template version, selected/available/booked spot IDs, optional approved creative. A sibling text list provides names, prices, selection and actions for keyboard/screen-reader users. Surface tabs are needed only for multiple activated views. Preserve selection on viewport changes and communicate availability in text, not color alone.
 
-Artwork is untrusted media: accept a small validated raster set initially, keep originals private, approve exact creative version before production, and render bounded sanitized previews. The renderer owns presentation, never pricing, availability, ownership or payment state.
+The seller confirms the actual object, fit, advertising rights and production/application responsibility; template approval certifies only the stated geometry/checks, not attendance or fulfillment. P0 records private creative references and party approval; it does not fetch/embed arbitrary referenced artwork. Once MEDIA-001 enables native uploads, accept a small validated raster set, keep originals private and render bounded sanitized previews. The renderer owns presentation, never pricing, availability, ownership or payment state.
 
 Tests: manifest consistency, geometry bounds, immutable versions, asset/definition match, accessible selection, mobile hit targets and unavailable states. Physical trials validate fit, adhesion/print quality, removal, cost and lead time. No AI canonical geometry, drag sizing, 3D or generic editor.
