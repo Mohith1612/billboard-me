@@ -11,15 +11,20 @@ response_file="$(mktemp)"
 
 cleanup() {
   if [[ -n "$next_pid" ]]; then
-    kill "$next_pid" 2>/dev/null || true
+    # The server is started under `setsid`, so the negated PID signals the whole
+    # session. Killing only the wrapper leaves `next dev` running, and a second
+    # run of this script then fails with "Another next dev server is already
+    # running" for this directory.
+    kill -TERM -- "-$next_pid" 2>/dev/null || kill -TERM "$next_pid" 2>/dev/null || true
     wait "$next_pid" 2>/dev/null || true
+    next_pid=""
   fi
   docker rm --force "$container_name" >/dev/null 2>&1 || true
   rm -f "$next_log" "$response_file"
 }
 trap cleanup EXIT
 
-for command_name in docker psql curl pnpm; do
+for command_name in docker psql curl pnpm setsid; do
   if ! command -v "$command_name" >/dev/null 2>&1; then
     echo "Required command not found: $command_name" >&2
     exit 1
@@ -80,11 +85,10 @@ psql "$upgrade_admin_url" --file "$repo_root/tests/db/waitlist-access.sql"
 
 server_url="postgresql://waitlist_server:${server_password}@127.0.0.1:${postgres_port}/foundation_fresh"
 next_port="$((41000 + RANDOM % 20000))"
-(
-  cd "$repo_root"
+setsid env --chdir="$repo_root" \
   DATABASE_URL="$server_url" NEXT_PUBLIC_SITE_URL="http://127.0.0.1:${next_port}" \
-    pnpm exec next dev --hostname 127.0.0.1 --port "$next_port" >"$next_log" 2>&1
-) &
+  "$repo_root/node_modules/.bin/next" dev --hostname 127.0.0.1 --port "$next_port" \
+  >"$next_log" 2>&1 &
 next_pid=$!
 
 for _ in {1..60}; do
