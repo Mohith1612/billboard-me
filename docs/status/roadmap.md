@@ -1,10 +1,10 @@
 # Dependency-aware roadmap
 
-**Status:** proposed execution plan, 2026-09-14. Product remains Stage 0. [PRD](../product/prd.md) owns scope and gates; [audit](current-state.md) owns current implementation; [backlog](backlog.md) links all 48 fully specified GitHub issues. No backlog feature was implemented by this planning task.
+**Status:** reconciled execution plan, 2026-09-15; PR #52 baseline merged, specific decisions still gated. Product remains Stage 0. [PRD](../product/prd.md) owns scope and gates; [audit](current-state.md) owns current implementation; [backlog](backlog.md) links all 48 fully specified GitHub issues. No backlog feature was implemented by this planning task.
 
 ## Start here
 
-**Current coding issue: [FOUNDATION-001 — Enforce server-only waitlist data access (#4)](https://github.com/Mohith1612/billboard-me/issues/4).** Its implementation establishes and tests the server/client data boundary while preserving migration 0000 and waitlist behavior. It still requires human review and merge. After that dependency is merged, [FOUNDATION-002 (#5)](https://github.com/Mohith1612/billboard-me/issues/5) is next in this lane, followed by the broader test harness and CI.
+**Next issue to finish: [FOUNDATION-002 — Validate environment and document database connection roles (#5)](https://github.com/Mohith1612/billboard-me/issues/5).** FOUNDATION-001 (#4) merged in PR #53. FOUNDATION-002 already has open [PR #54](https://github.com/Mohith1612/billboard-me/pull/54); handle review/fixes there and obtain founder merge, without duplicating implementation. That establishes the validated environment/DB boundary for the general harness and CI.
 
 In parallel, founder runs seller/buyer matching ([#9](https://github.com/Mohith1612/billboard-me/issues/9)), physical rights/production trial ([#10](https://github.com/Mohith1612/billboard-me/issues/10)) and provider eligibility ([#11](https://github.com/Mohith1612/billboard-me/issues/11)). These are evidence/decision work, not three product-feature teams. Existing lead protection need not wait for demand validation.
 
@@ -44,19 +44,23 @@ flowchart TD
   ONBOARD --> CHECKOUT[PAY-003: checkout]
   ORDER --> CHECKOUT
   CHECKOUT --> EVENTS[PAY-004: events and funding]
-  AUTH --> MEDIA[MEDIA-001: private files]
-  HOST --> MEDIA
-  EVENTS --> CAM[CAMPAIGN-001: prepare and execute]
-  MEDIA --> CAM
-  CAM --> PROOF[PROOF-001: manual proof review]
+  EVENTS --> CAM[CAMPAIGN-001: seller fulfillment and messages]
+  PHYS --> CAM
+  TERMS --> CAM
+  CAM --> PROOF[PROOF-001: evidence and sponsor response]
   EVENTS --> REFUND[PAY-005: refunds and disputes]
-  PROOF --> SETTLE[PAY-006: verified settlement]
+  TERMS --> REFUND
+  EVENTS --> SETTLE[PAY-006: normal provider settlement]
   REFUND --> SETTLE
   SETTLE --> OPS[OPS-001: work queue and reconciliation]
   SHARE --> OPS
+  CAM --> OPS
+  PROOF --> OPS
   OPS --> REHEARSE[LAUNCH-001: complete sandbox release gate]
   REHEARSE --> LIVE[LAUNCH-002: first 1–5 paid campaigns]
   LIVE --> BETA[BETA-001: controlled expansion to 10]
+  AUTH --> MEDIA[MEDIA-001 P1: native private uploads]
+  HOST --> MEDIA
   BETA --> HARDEN[BETA-002/003: abuse and observability]
   BETA --> CONVENIENCE[BETA-004/005: measured UX experiments]
   HARDEN --> PUBLIC[PUBLIC-001: founder expansion decision]
@@ -69,13 +73,15 @@ flowchart TD
   HUNDRED --> FUTURE[FUTURE-001..004: individual evidence gates]
 ```
 
+There is deliberately **no PROOF-001 → PAY-006 edge**. The payment lane can be integrated/rehearsed before campaign/evidence UI exists; production launch still needs participant records, evidence/support and both lanes tested. MEDIA-001 is P1 with auth/runtime prerequisites and no P0 dependent; advance it only if agreed original-evidence retention requires it.
+
 The arrows do not imply all three commercial gates can be replaced by code. If PAY-001 fails, the payment lane stops pending a founder-approved commercial redesign. Do not complete the rest of the marketplace hoping eligibility will solve itself. Foundational privacy/testing work still has value.
 
 ## Stages, dependency outputs and exit gates
 
 | PRD stage | Issues / inputs | Output needed by the next stage | Verification / gate |
 | --- | --- | --- | --- |
-| 0 — Current | PLAN-001 #3; prior PR #2 | Honest source audit and approved blueprint | Docs PR reviewed by founder; no implemented-state inflation |
+| 0 — Current | PLAN-001 #3 / PR #52; PLAN-002 #55; PR #53 access correction | Honest source audit and approved blueprint | Docs PR reviewed by founder; no implemented-state inflation |
 | 1 — Engineering foundation | FOUNDATION-001..005 | Private access, env, test commands/CI, runtime choice | Role denial tests, migration harness, browser smoke, exact runtime evidence |
 | 2 — Domain foundation | DOMAIN-001..003, AUTH-001/002; physical trial | Agreed keys/roles/inventory templates/ownership | Domain ADR approval; deterministic template import; cross-owner tests |
 | 3 — Seller MVP | SELLER-001..003; DECISION-001 | Approved listings with period, price, terms, signals | Real invited seller creates and founder reviews draft |
@@ -83,14 +89,14 @@ The arrows do not imply all three commercial gates can be replaced by code. If P
 | 5 — Buyer/offer flow | BUYER-001/002 | Current immutable proposal with mutual acceptance path | Reject/counter/withdraw/expiry/stale-action tests |
 | 6 — Orders | ORDER-001/002 | Frozen terms and exclusive held inventory | Concurrent acceptance, cross-listing overlap and clock/retry cases |
 | 7 — Payments | PAY-001 approval, PAY-002..004; refund design | Eligible seller, exact checkout, durable funding | Signed sandbox events, timeout/late-capture/replay and amount checks |
-| 8 — Campaign execution | MEDIA-001, CAMPAIGN-001 | Funded unique campaign with production and creative readiness | Preparation failure/reschedule/period tests; actual runtime media |
-| 9 — Proof/payout | PROOF-001, PAY-005/006, OPS-001 | Approved evidence, resolved funds and operator accountability | Proof rejection, dispute/refund/release race and bank-settlement failure cases |
+| 8 — Campaign execution | CAMPAIGN-001; approved seller obligations | Funded unique campaign, private messages and seller fulfillment record | Actor/access/change-notice tests; no mandatory platform production controller |
+| 9 — Evidence and settlement outcomes | PROOF-001 + independent PAY-005/006, OPS-001 | Sponsor evidence response, normal settlement and support records | Settlement before proof, nonperformance after settlement, refund/recovery race and unresolved-case tests |
 | 10 — First real campaign | LAUNCH-001/002 plus commercial gates | First, then 1–5 real complete loops and costs/lessons | Founder live go/no-go; verified bank receipt; actual buyer/seller feedback |
-| 11 — Public beta | BETA-001..005 | Controlled expansion toward 10 with capacity and repeat-demand evidence | Keep curated supply; implement conveniences only when measured |
+| 11 — Public beta | BETA-001..005; P1 MEDIA-001 when needed | Controlled expansion toward 10 with capacity and repeat-demand evidence | Keep curated supply; implement conveniences only when measured |
 | 12 — Marketplace expansion | PUBLIC-001..005 | Public reviewed intake, basic catalogue, earned history; work toward 100 | Founder access decision, support/financial quality, stable unit economics |
 | 13 — Future | FUTURE-001..004 | Evidence for one family, procurement model, pricing intervention or corridor | Separate experiment/ADR before each implementation |
 
-There are no calendar promises. External provider approval, seller availability and real event dates control part of the schedule. Use the shortest approved campaign/booking period that permits preparation and proof within settlement constraints. The first target is a completed loop, not completion of all 48 issues.
+There are no calendar promises. External provider approval, seller availability and real event dates control part of the schedule. Use a simple approved period with feasible seller preparation; verify provider advance-booking restrictions. Evidence need not precede normal settlement. The first target is a completed loop, not completion of all 48 issues.
 
 ## Safe parallel work
 
@@ -99,7 +105,7 @@ There are no calendar promises. External provider approval, seller availability 
 | Foundation code + founder demand/production/provider research + domain decision review | Separate docs sections/issue ownership; no shared schema edits; no unauthorized external contact |
 | Template SVG/manifest preparation + auth integration | Agreed version/key contracts; one migration owner sequences actual catalogue/auth schema merges |
 | Public page presentation + listing operations | Stable public DTO/fixture, same published/privacy states; UI agent does not edit schema or invent inventory |
-| Private storage adapter + offer/page UI | Auth permission contract and chosen host fixed; coordinate media schema, separate files/worktrees |
+| P1 private storage adapter + isolated beta UI | Auth permission contract and chosen host fixed; coordinate schema; not a P0 campaign dependency |
 | Campaign presentation + payment provider implementation | Agreed lifecycle fixtures; payment owner alone changes financial states and money adapter |
 | Beta analytics or catalogue presentation + other isolated UI tasks | Shared access/metrics contracts merged first; no competing package/lock/schema changes |
 
@@ -109,8 +115,8 @@ One issue/branch/worktree per code agent. A fixture-driven UI PR must state that
 
 - **Schema/migrations:** one owner at a time, including Better Auth generation, catalogue seeding and financial tables. Merge/rebase prerequisite migrations before generating the next one. No editing applied files.
 - **Auth/security:** identity IDs, roles, invitation redemption and public/private data contracts settle before dependent ownership checks.
-- **Domain state machines:** order acceptance/reservation/funding/proof-release authority changes reviewed together; UI agents consume them.
-- **Payments:** provider eligibility → provider contract → onboarding → checkout → signed events → refund/reversal safeguards → settlement. Campaign/proof presentation can advance on fixtures, but release waits on verified proof and financial controls.
+- **Domain state machines:** order acceptance/reservation/funding, sponsor evidence attribution and independent-settlement authority changes reviewed together; UI agents consume them.
+- **Payments:** provider eligibility → provider contract → onboarding → checkout → signed events → refund/reversal safeguards → settlement. Campaign/evidence presentation can advance on fixtures. Normal settlement requires provider financial controls, not proof; full live launch waits for both independent lanes and support readiness.
 - **Architectural decisions:** founder accepts ADRs and commercial choices. Agents cannot turn a documented candidate into an accepted choice by installing it.
 - **Release:** complete nonproduction rehearsal, then explicit founder live go/no-go, then actual paid campaign. An implementation PR does not authorize executing a live campaign.
 

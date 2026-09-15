@@ -6,9 +6,9 @@ This glossary defines the proposed product model. [PRD](docs/product/prd.md) own
 
 **Seller:** A person approved to sell sponsorship on an object they own or have permission to use. A social following is one possible distribution signal, not the definition of a seller.
 
-**Buyer:** The person agreeing to and purchasing sponsorship, including a person acting for a brand.
+**Buyer / sponsor:** The person evaluating, agreeing to and purchasing sponsorship, including a person acting for a brand. One identity, not separate buyer and sponsor entities.
 
-**Operator:** The founder or an explicitly authorized person carrying out approval, fulfillment and support work.
+**Operator:** The founder or an explicitly authorized person carrying out scoped supply approval, platform operations and support work; not inherently guaranteeing seller fulfillment.
 
 **Asset:** A particular physical object controlled by a seller, such as their running jersey.
 
@@ -37,11 +37,17 @@ _Avoid_: Campaign (before an order is funded).
 
 **Payment:** Money collected from the buyer through the approved provider.
 
-**Campaign:** The execution of the sponsorship purchased in a funded order.
+**Campaign:** The record of seller fulfillment purchased in a funded order, with party reports, dates and outcome. It is not a platform performance guarantee.
 
-**Deliverable:** An explicit seller or operator obligation that the buyer agreed to purchase.
+**Deliverable:** An explicit obligation assigned to a named party in accepted terms; the seller normally supplies the physical sponsorship. Platform fulfillment assistance must be separately agreed.
 
-**Proof:** Submitted evidence intended to show that agreed campaign deliverables were fulfilled.
+**Proof:** Evidence intended to show agreed deliverables were fulfilled, with submitter, context and sponsor response. Review provenance matters; evidence is not an automatic settlement gate.
+
+**Platform fee:** Billboard.me’s agreed commission, snapshotted per order; not necessarily net profit.
+
+**Seller share:** Amount allocated to the seller under the agreed fee/cost terms; not an app wallet balance.
+
+**Settlement:** Actual payment-provider settlement on its approved schedule, independent of campaign/evidence status. A provider risk restriction is not a product proof hold.
 
 **Transfer:** A provider's allocation or movement of collected funds to a seller's linked provider account. It does not by itself establish bank receipt.
 
@@ -53,4 +59,4 @@ _Avoid_: Campaign (before an order is funded).
 
 **Dispute:** A claim that a commercial obligation or payment is contested, raised through support or the payment provider.
 
-**Completed paid campaign:** A fulfilled campaign with approved proof and successful seller payout, subject to the reporting rules in the PRD.
+**Completed paid campaign:** A fulfilled paid campaign with sponsor-acknowledged evidence and successful seller settlement under the PRD reporting rule. These facts can occur in any order after payment; operator closure alone does not verify fulfillment. Transactions without evidence are reported separately.

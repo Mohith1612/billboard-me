@@ -1,6 +1,6 @@
 # Current state and implementation audit
 
-**Audited:** 2026-09-14. **Source baseline:** `b9bea6d`, merge of planning [PR #52](https://github.com/Mohith1612/billboard-me/pull/52). **Stage 0:** landing page and persisted lead capture. FOUNDATION-001 [issue #4](https://github.com/Mohith1612/billboard-me/issues/4) now protects the repository's waitlist data path; deployment remains unverified. This does not advance the product to authentication, listings or payments.
+**Rechecked:** 2026-09-15. **Source baseline:** `55e41d4`, merge of [PR #53](https://github.com/Mohith1612/billboard-me/pull/53), after planning [PR #52](https://github.com/Mohith1612/billboard-me/pull/52). **Stage 0:** landing page and persisted lead capture. FOUNDATION-001 [issue #4](https://github.com/Mohith1612/billboard-me/issues/4) now protects the repository's waitlist data path; deployment remains unverified. This does not advance the product to authentication, listings or payments.
 
 The [PRD](../product/prd.md), [roadmap](roadmap.md) and [GitHub backlog](backlog.md) are intended work. An empty folder, architecture preference, generated SQL file or proposed ADR does not establish working functionality.
 
@@ -37,7 +37,7 @@ Completeness labels: **implemented** = concrete working source within stated sco
 | Sponsorship pages | Shareable seller opportunity | No dynamic seller/page route | Missing | Only landing/two waitlists are public pages |
 | Offers/orders/reservations | Agreed terms and exclusive allocation | No code or schema | Missing | No concurrency protection needed/implemented for nonexistent orders |
 | Payments/KYC/fees | One approved provider marketplace flow | No dependency/config/API/integration | Scaffolded; documented only | Empty `src/lib/payments`; Route candidate not approved; research identifies eligibility risk |
-| Campaigns/proof/payouts | Executed campaigns with approved evidence and bank receipt | No schema/files/operations | Missing | Marketing copy promises future behavior; no campaign completion evidence in repo |
+| Campaigns/proof/payouts | Seller fulfillment records, attributed evidence and independent bank settlement | No schema/files/operations | Missing | Marketing copy promises future behavior; no campaign completion evidence in repo |
 | Object storage/Sharp | Private proof/creative processing | No R2/Supabase Storage client or upload routes; no Sharp pipeline | Scaffolded; documented only | `src/lib/storage` empty; sharp transitive lock entry/ignored build script is not implementation |
 | Email/notifications | Sign-in and transaction communication | Contact mailto link only | Missing | No Resend; leads read manually via database tools |
 | Analytics/error tracking | Funnel and operational visibility | Console error on failed waitlist insert; no SDK/event/reporting | Partial error log only | No PostHog/Sentry; raw error logging should be reviewed for sensitivity |
@@ -52,7 +52,7 @@ Completeness labels: **implemented** = concrete working source within stated sco
 ## Important contradictions and unsupported claims
 
 - `hero.tsx`: “No fees while we're invite-only” conflicts with introducing a take rate without a waiver/transition decision. Future agents must not deduct 15% by default.
-- `how-it-works.tsx`: platform handles decal/printing/delivery and proof releases payout. Fulfillment costs, provider capability and settlement schedule are unverified.
+- `how-it-works.tsx`: platform handles decal/printing/delivery and proof releases payout. These source promises conflict with the reconciled marketplace model. PAGE-002 must correct them under approved policy; this documentation task does not edit the marketing UI.
 - `hero.tsx`, `where-we-are.tsx`, ticker aria label and plate annotations describe surfaces as live/supported/open for rent despite no inventory. `premise.tsx` claims the laptop is the most-looked-at café surface without evidence. These are copy issues, not measured traction.
 - `asset-plates.tsx`: viewBox rectangle width/height printed as MM, with no physical sizing relationship. Do not derive manufacture from those labels.
 - README/architecture formerly listed R2/shadcn as though present. They are plans; this documentation PR clarifies the distinction.
@@ -71,6 +71,6 @@ Git history shows foundation scaffolding (`c74f4c3`), canonical AGENTS/workflow/
 
 ## Next action
 
-After FOUNDATION-001 is reviewed and merged, **FOUNDATION-002 — Validate environment and document database connection roles** is next in this lane. FOUNDATION-003/004 then make the broader test harness and CI repeatable. Founder demand, production and payment-eligibility investigations can proceed independently.
+FOUNDATION-001 (#4) is closed and merged in PR #53. **FOUNDATION-002 — Validate environment and document database connection roles (#5)** remains the next issue to finish; its implementation already exists in open [PR #54](https://github.com/Mohith1612/billboard-me/pull/54), pending human review/merge. Continue that work rather than creating a duplicate implementation. FOUNDATION-003/004 then make the broader test harness and CI repeatable. Founder demand, production and payment-eligibility investigations can proceed independently.
 
-No evidence in this audit establishes any completed real campaign. Planning outputs and open issues are not shipped features; FOUNDATION-001 still requires human review and merge, and its migration still requires separately controlled deployment.
+No evidence in this audit establishes any completed real campaign. Planning outputs and open issues are not shipped features; FOUNDATION-001 is merged, and its migration still requires separately controlled deployment. PR #54’s proposed env implementation is not part of this audited main baseline. PLAN-002 changes only planning/issue requirements; it adds no marketplace features.

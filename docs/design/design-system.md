@@ -155,3 +155,8 @@ labels are not validated print sizes; [template architecture](../architecture/as
 separates canonical geometry from measured production dimensions. Future brand
 artwork is reviewed media, not executable seller-supplied SVG. Real trust signals
 need explicit provenance and consent; no fake listings, proof or rating stars.
+
+Marketplace wording and trust labels follow the PRD responsibility boundary: show
+who fulfills, what was actually checked, and which party acknowledged evidence.
+Keep payment, provider settlement, seller fulfillment and sponsor response visually
+distinct. Do not imply guaranteed attendance, ROI or proof-gated seller payment.
