@@ -2,11 +2,15 @@
 
 ## Current reality
 
-Only `pnpm lint`, `pnpm typecheck` and `pnpm build` exist. They passed during the 2026-09-14 baseline audit. There is no `test` script, Vitest, Playwright or CI workflow. PR #2 records a historical manual browser/database pass; this planning PR did not rerun it. Never report absent tests as passing.
+`pnpm lint`, `pnpm typecheck` and `pnpm build` cover static/build checks. FOUNDATION-001 adds targeted shell/SQL commands, but there is no general `test` script, Vitest, Playwright or CI workflow. PR #2 records a historical manual browser/database pass. Never report absent tests as passing.
+
+`pnpm test:client-boundary` builds a disposable Next.js fixture whose Client Component imports the real database module. The command passes only when Next rejects that import because of the `server-only` marker.
+
+`pnpm test:db:waitlist` requires Docker, `psql`, and `curl`. It creates disposable PostgreSQL 16 databases and synthetic roles, applies both a fresh migration sequence and the 0000→0001 upgrade, runs `tests/db/waitlist-access.sql`, confirms upgrade-row preservation, and POSTs synthetic seller and brand submissions through the real route using a non-owner `BYPASSRLS` server role. The container and fixtures are removed afterward. It never targets the configured development or production database.
 
 ## Incremental plan
 
-FOUNDATION-001 adds a reproducible role-level SQL assertion for waitlist isolation on a disposable DB, without waiting for a framework. FOUNDATION-003 adds Vitest and disposable Postgres integration; FOUNDATION-004 adds CI and a production-build Playwright smoke journey. Later issues extend meaningful behavior tests rather than installing a second framework.
+FOUNDATION-001 supplies the reproducible role-level waitlist assertions described above, without a framework. FOUNDATION-003 adds Vitest and a reusable disposable Postgres integration harness; FOUNDATION-004 adds CI and a production-build Playwright smoke journey. Later issues extend meaningful behavior tests rather than installing a second framework.
 
 Read the installed version's guides before configuration: `node_modules/next/dist/docs/01-app/02-guides/testing/vitest.md` and `playwright.md`. The Vitest guide notes async Server Component limitations; test those through browser journeys instead of asserting unrepresentative component mocks.
 

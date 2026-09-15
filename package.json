@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "test:client-boundary": "bash tests/client-boundary/run-db-import-check.sh",
+    "test:db:waitlist": "bash tests/db/run-waitlist-access.sh",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio"

@@ -1,12 +1,12 @@
 # Known issues and decision risks
 
-**Baseline:** 2026-09-14 / `41949fe`. All below are open unless a linked issue later records verified resolution. [Backlog](backlog.md) links each code to its actual GitHub issue. Code gaps and uncertain live configuration are distinguished; this audit did not inspect production data.
+**Baseline:** 2026-09-14 / planning merge `b9bea6d` plus the FOUNDATION-001 implementation. All below remain open unless a linked issue records verified resolution. [Backlog](backlog.md) links each code to its actual GitHub issue. Repository controls and uncertain deployed configuration are distinguished; no production data was inspected.
 
 | Finding | Evidence / impact | Priority and owner issue | Resolution evidence |
 | --- | --- | --- | --- |
-| Waitlist data access not explicit | Migration has no RLS/grants; potential direct Data API exposure depends on actual grants/config | P0 FOUNDATION-001 | Role-level denial tests plus separately recorded deployed verification |
+| Waitlist deployed access unverified | Repository migration enables RLS and revokes `anon`/`authenticated`; actual Supabase application, exposed schemas, grants and runtime role are not inspected | P0 FOUNDATION-001, then FOUNDATION-002 for role validation | Disposable fresh/upgrade/route checks pass; operator metadata verification and controlled deployment remain |
 | Unvalidated environment | DATABASE_URL assertion; localhost public URL; unused Supabase keys in example | P0 FOUNDATION-002 | Explicit env/runtime behavior, role/pool documentation, no client secret import |
-| No automated tests or CI | No runner/scripts/test files/workflow | P0 FOUNDATION-003/004 | Repeatable safe test commands and passing PR CI |
+| No general test suite or CI | Targeted waitlist shell/SQL checks exist; no Vitest/Playwright/general harness/workflow | P0 FOUNDATION-003/004 | Repeatable broader behavior tests and passing PR CI |
 | Hosting not proven | Empty config; no tracked deployment | P0 FOUNDATION-005 | Exact runtime spike, later integrated auth/media/webhook validation |
 | Payment eligibility/timing unresolved | Route threshold, Cashfree unknown eligibility, Stripe India restrictions, Dodo mismatch | P0 PAY-001 | Written provider approval and funds flow, or founder no-go/revised model |
 | Fee and production copy unsupported | No-fees/print-delivery/proof-release promises | P0 DECISION-001, VALIDATION-002; copy implementation PAGE-002 | Agreed terms/economics and consistent public copy |

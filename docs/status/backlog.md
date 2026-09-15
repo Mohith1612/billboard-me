@@ -4,9 +4,9 @@
 
 **48 issues:** 34 P0 (first campaign), 5 P1 (controlled beta), 5 P2 (public marketplace), 4 P3 (future). Includes founder decisions, validation and release work as well as implementation. P3 entries are dormant hypotheses, not authorization to build.
 
-**First coding issue:** [FOUNDATION-001: Enforce server-only waitlist data access](https://github.com/Mohith1612/billboard-me/issues/4). After it merges, continue with FOUNDATION-002. Founder validation and provider eligibility can run independently now.
+**Current coding issue:** [FOUNDATION-001: Enforce server-only waitlist data access](https://github.com/Mohith1612/billboard-me/issues/4). Its implementation remains dependency-incomplete until human review and merge; then continue with FOUNDATION-002. Founder validation and provider eligibility can run independently now.
 
-Every issue also depends on founder review/merge of this planning PR. A dependency means merged code or recorded founder-approved evidence/decision, not merely a closed issue. The table is topologically ordered; it is not a mandate to finish one independent lane before beginning another. See [roadmap](roadmap.md) and [agent workflow](../development/agent-workflow.md).
+The planning baseline was founder-merged in PR #52. A dependency means merged code or recorded founder-approved evidence/decision, not merely an implementation branch, open PR or closed issue. The table is topologically ordered; it is not a mandate to finish one independent lane before beginning another. See [roadmap](roadmap.md) and [agent workflow](../development/agent-workflow.md).
 
 | Order | Issue | Priority | Kind | Dependencies beyond PLAN-001 |
 | --- | --- | --- | --- | --- |
