@@ -37,13 +37,16 @@ docker run --detach --rm \
   --publish 127.0.0.1::5432 \
   postgres:16-alpine >/dev/null
 
+# Readiness is checked over TCP, not over the Unix socket: the image bootstraps
+# the cluster with a temporary server that listens on the socket only, so a
+# socket check can report "ready" during initialisation and fail moments later.
 for _ in {1..60}; do
-  if docker exec "$container_name" pg_isready --username postgres >/dev/null 2>&1; then
+  if docker exec "$container_name" pg_isready --host 127.0.0.1 --username postgres >/dev/null 2>&1; then
     break
   fi
   sleep 1
 done
-docker exec "$container_name" pg_isready --username postgres >/dev/null
+docker exec "$container_name" pg_isready --host 127.0.0.1 --username postgres >/dev/null
 
 postgres_port="$(docker port "$container_name" 5432/tcp | sed 's/.*://')"
 admin_url="postgresql://postgres:${postgres_password}@127.0.0.1:${postgres_port}"
