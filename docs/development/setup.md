@@ -29,7 +29,8 @@ cp .env.example .env.local
 | --- | --- | --- |
 | Application (`DATABASE_URL`) | `src/lib/db/index.ts` through the waitlist route | `USAGE` on `public`, `INSERT` on `seller_waitlist` and `brand_waitlist`, and the ability to bypass their RLS (table owner, superuser, or a narrowly granted `BYPASSRLS` role). Nothing more. |
 | Migration (`DATABASE_MIGRATION_URL`, else `DATABASE_URL`) | `pnpm db:migrate`, `db:generate`, `db:studio` | Schema ownership: create and alter tables, enable RLS, grant and revoke. |
-| Test | `pnpm test:db:waitlist`, `pnpm test:env` | Created and destroyed by the scripts themselves. They never read `.env.local` and never target your development database. |
+| Test (`TEST_DATABASE_URL`) | `pnpm test`, and the `tests/support` harness it drives | A role on a throwaway cluster that may create and drop databases and roles — `postgres` in the container `pnpm test` starts. Required, with no fallback: the harness refuses a value naming the database configured in your environment or `.env.local`, and only ever creates or drops names prefixed `billboard_test_`. |
+| Test (scripts) | `pnpm test:db:waitlist`, `pnpm test:env` | Created and destroyed by the scripts themselves. They never read `.env.local` and never target your development database. |
 
 The RLS bypass on the application role is infrastructure authority, not end-user authorisation: migration `0001` revokes every table privilege from `anon` and `authenticated` and adds no client policy, so the browser has no database path to lead data at all. Keep that role's credentials out of any browser module — `src/lib/env/server.ts` is marked `server-only` and `pnpm test:client-boundary` proves it.
 
@@ -53,13 +54,16 @@ Open localhost:3000. Current routes are `/`, `/waitlist/seller`, `/waitlist/bran
 ```bash
 pnpm lint
 pnpm typecheck
+pnpm test                    # unit and integration behavior tests
 pnpm test:client-boundary
 pnpm test:env
 pnpm test:db:waitlist
 pnpm build
 ```
 
-The waitlist database check requires Docker, `psql`, `curl` and `setsid`. It starts disposable PostgreSQL 16, creates synthetic roles/data, tests fresh and upgrade migration paths, and exercises both waitlist route variants; it never reads `.env.local` for its database target. The client-boundary check builds disposable fixtures and expects Next.js to reject a client import of `src/lib/db` and of `src/lib/env/server`. The environment check requires `curl` and `setsid`; it copies the app into a disposable `.tmp-env-check/` directory that has no `.env*` file of its own, then asserts that a production build refuses a missing or invalid canonical origin, that a build with no `DATABASE_URL` still succeeds and serves the configured origin in robots.txt and the sitemap, and that a missing or malformed `DATABASE_URL` fails at the waitlist route naming the variable. There is still no general test runner or CI workflow; [Testing](testing.md) specifies FOUNDATION-003/004 and later expectations. A fresh typecheck may need Next-generated route types. Build fetches next/font resources when they are not cached. None of these local checks proves remote DB connectivity, deployed grants or production configuration.
+`pnpm test` is the behavior suite. It starts a disposable PostgreSQL 16 container, sets `TEST_DATABASE_URL` to it, runs the Vitest `unit` and `integration` projects and removes the container, so it needs Docker and no credentials. `pnpm test:unit` skips the database entirely; export your own throwaway `TEST_DATABASE_URL` to skip the container. It never reads `.env.local` except to refuse to run against the database named there. [Testing](testing.md) describes what each project covers and [ADR-006](../decisions/ADR-006-behavior-test-harness.md) why the harness is shaped this way.
+
+The waitlist database check requires Docker, `psql`, `curl` and `setsid`. It starts disposable PostgreSQL 16, creates synthetic roles/data, tests fresh and upgrade migration paths, and exercises both waitlist route variants; it never reads `.env.local` for its database target. The client-boundary check builds disposable fixtures and expects Next.js to reject a client import of `src/lib/db` and of `src/lib/env/server`. The environment check requires `curl` and `setsid`; it copies the app into a disposable `.tmp-env-check/` directory that has no `.env*` file of its own, then asserts that a production build refuses a missing or invalid canonical origin, that a build with no `DATABASE_URL` still succeeds and serves the configured origin in robots.txt and the sitemap, and that a missing or malformed `DATABASE_URL` fails at the waitlist route naming the variable. There is still no CI workflow and no browser journey; [Testing](testing.md) specifies FOUNDATION-004 and later expectations. A fresh typecheck may need Next-generated route types. Build fetches next/font resources when they are not cached. None of these local checks proves remote DB connectivity, deployed grants or production configuration.
 
 ## Verify a deployed database without exposing secrets
 
