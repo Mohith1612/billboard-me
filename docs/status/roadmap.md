@@ -4,7 +4,7 @@
 
 ## Start here
 
-**Next implementation issue: [FOUNDATION-003 — Add behavior tests and a disposable Postgres test harness (#6)](https://github.com/Mohith1612/billboard-me/issues/6).** FOUNDATION-001 and FOUNDATION-002 merged in PR #53 and [PR #54](https://github.com/Mohith1612/billboard-me/pull/54). The validated environment/lazy database boundary and existing targeted checks are available; extend them into a reusable harness before FOUNDATION-004 adds CI.
+**Next implementation issue: [FOUNDATION-004 — Run required CI checks and one production-browser smoke journey (#7)](https://github.com/Mohith1612/billboard-me/issues/7), once FOUNDATION-003 is reviewed and merged.** FOUNDATION-001 and FOUNDATION-002 merged in PR #53 and [PR #54](https://github.com/Mohith1612/billboard-me/pull/54). FOUNDATION-003 adds `pnpm test` — Vitest unit and integration projects on a disposable Postgres harness — so the checks CI has to run now exist; the runtime pin and browser journey do not.
 
 In parallel, founder runs seller/buyer matching ([#9](https://github.com/Mohith1612/billboard-me/issues/9)), physical rights/production trial ([#10](https://github.com/Mohith1612/billboard-me/issues/10)) and provider eligibility ([#11](https://github.com/Mohith1612/billboard-me/issues/11)). These are evidence/decision work, not three product-feature teams. Existing lead protection need not wait for demand validation.
 

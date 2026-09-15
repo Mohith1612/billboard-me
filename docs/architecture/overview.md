@@ -44,7 +44,8 @@ The [lifecycle](transaction-lifecycle.md) is shared by UI, route handlers, recon
 | Sharp | Not direct dependency or implemented pipeline. Transitively referenced and ignored for build scripts. Canonical SVG needs none; photo sanitization/thumbnails must be proven on selected runtime; no video transcoding in P0 |
 | Resend | Absent. Sign-in mail and required campaign notifications justify it; lead-notification automation alone is not a first-campaign blocker |
 | PostHog / Sentry | Absent. Sanitized errors, operator visibility and durable funnel milestones are P0; SDKs/dashboards P1 unless evidence demands earlier |
-| Vitest / Playwright / GitHub Actions | Absent. Add behavior tests, disposable Postgres integration and a critical browser journey; CI runs required checks |
+| Vitest | Installed by FOUNDATION-003 with a disposable Postgres harness ([ADR-006](../decisions/ADR-006-behavior-test-harness.md)); extend it per domain module rather than adding a second runner |
+| Playwright / GitHub Actions | Absent. Add a critical browser journey against a production build; CI runs the required checks on a pull request |
 | Cloudflare | Preference, no deployment. Exact-repo OpenNext spike; managed Node fallback with founder approval if friction persists. [Deployment](deployment.md) |
 
 ## Operational minimum

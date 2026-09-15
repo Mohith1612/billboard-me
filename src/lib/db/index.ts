@@ -15,16 +15,33 @@ import * as schema from "./schema";
  * instead of silently connecting to a postgres.js default.
  */
 
+let client: ReturnType<typeof postgres> | undefined;
 let database: ReturnType<typeof createDatabase> | undefined;
 
 function createDatabase() {
   // `prepare: false` keeps the client usable through a transaction pooler,
   // which does not support named prepared statements.
-  const client = postgres(requireDatabaseUrl(), { prepare: false });
+  client = postgres(requireDatabaseUrl(), { prepare: false });
   return drizzle(client, { schema });
 }
 
 export function getDb() {
   database ??= createDatabase();
   return database;
+}
+
+/**
+ * Closes the pooled connection and forgets the client, so the next `getDb()`
+ * builds a new one from the current configuration.
+ *
+ * The running server never calls this: it wants the pool to live as long as the
+ * process. The integration suite does, because each case points the module at a
+ * different disposable database, and because an idle socket would otherwise
+ * keep the test run from exiting.
+ */
+export async function closeDb(): Promise<void> {
+  const open = client;
+  client = undefined;
+  database = undefined;
+  await open?.end({ timeout: 5 });
 }

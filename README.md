@@ -44,6 +44,9 @@ Full setup instructions, including the privileges each connection needs, are in
 | `pnpm start` | Serve the production build |
 | `pnpm lint` | ESLint |
 | `pnpm typecheck` | `tsc --noEmit` |
+| `pnpm test` | Behavior suite: Vitest unit and integration projects on a disposable Postgres container (needs Docker) |
+| `pnpm test:unit` | The database-free half of the suite |
+| `pnpm test:integration` | Only the database half |
 | `pnpm test:client-boundary` | Prove the database and server-env modules cannot enter a client bundle |
 | `pnpm test:env` | Verify the environment contract: canonical origin, database-free build, database boundary |
 | `pnpm test:db:waitlist` | Verify waitlist grants, RLS, migrations, and route persistence in Docker |
@@ -54,9 +57,10 @@ Full setup instructions, including the privileges each connection needs, are in
 ## Stack
 
 Implemented: Next.js (App Router) + TypeScript, Tailwind CSS, Postgres through
-Drizzle/postgres.js, and Zod. Better Auth, object storage, payments, shadcn/ui,
-general application tests, CI, and deployment are not implemented yet. Targeted
-shell/SQL checks cover the waitlist data boundary. Supabase Postgres and
+Drizzle/postgres.js, Zod, and Vitest over a disposable Postgres harness. Better
+Auth, object storage, payments, shadcn/ui, browser journeys, CI, and deployment
+are not implemented yet. Targeted shell/SQL checks additionally cover the
+waitlist data boundary through a real build and a real HTTP server. Supabase Postgres and
 Cloudflare R2 are the preferred managed services; runtime and payment eligibility
 still need verification. It remains a single monolith.
 
@@ -68,6 +72,7 @@ src/app/api           Route handlers
 src/components        UI, grouped by area (marketing, waitlist)
 src/lib               Domain and infrastructure modules (env, db, waitlist, site)
 drizzle               Generated SQL migrations — never edit an applied one
+tests                 Behavior suite (unit, integration, support) and targeted shell checks
 docs                  Architecture, product, decisions (ADRs), status, design
 ```
 
@@ -78,7 +83,7 @@ docs                  Architecture, product, decisions (ADRs), status, design
 - [`docs/status/roadmap.md`](docs/status/roadmap.md) — dependencies and stage gates
 - [`docs/status/backlog.md`](docs/status/backlog.md) — 48 actual GitHub issues,
   ordered and classified P0–P3; FOUNDATION-001 and FOUNDATION-002 are merged,
-  FOUNDATION-003 is next
+  FOUNDATION-003 awaits review, FOUNDATION-004 is next
 - [`docs/status/product-model-reconciliation.md`](docs/status/product-model-reconciliation.md) — marketplace responsibility changes and all 48 issue dispositions
 - [`CONTEXT.md`](CONTEXT.md) — canonical domain vocabulary
 - [`docs/architecture/overview.md`](docs/architecture/overview.md) — how the app

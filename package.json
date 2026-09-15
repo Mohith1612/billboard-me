@@ -6,6 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "bash tests/with-postgres.sh vitest run",
+    "test:unit": "vitest run --project unit",
+    "test:integration": "bash tests/with-postgres.sh vitest run --project integration",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test:client-boundary": "bash tests/client-boundary/run-db-import-check.sh",
@@ -25,7 +28,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^22.20.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "dotenv": "^17.4.2",
@@ -33,7 +36,8 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.5",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^5.0.1"
   },
   "packageManager": "pnpm@10.15.1"
 }
