@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { brandWaitlist, sellerWaitlist } from "@/lib/db/schema";
 import { TRAP_FIELD, toFieldErrors, waitlistSubmissionSchema } from "@/lib/waitlist/schema";
 
@@ -38,6 +38,10 @@ export async function POST(request: Request) {
   const submission = parsed.data;
 
   try {
+    // Resolved here rather than at import time so a missing DATABASE_URL fails
+    // as a configuration error on this request instead of at build time.
+    const db = getDb();
+
     // Columns are listed explicitly rather than spread, so a schema change can
     // never silently start (or stop) persisting a field.
     if (submission.kind === "seller") {
