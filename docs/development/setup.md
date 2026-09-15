@@ -9,20 +9,38 @@ pnpm install --frozen-lockfile
 cp .env.example .env.local
 ```
 
-## Current environment contract
+## Environment contract
 
-Set `NEXT_PUBLIC_SITE_URL=http://localhost:3000` and a **nonproduction** `DATABASE_URL` for your own disposable/development Postgres instance. Do not print or commit secrets. The example currently includes unused Supabase public/anon/service-role entries and commented R2 entries; **none of those is consumed by the current app**. No Cloudflare or storage account is required to run the landing/waitlist app. FOUNDATION-002 will clean up the example and add validated configuration.
+`.env.example` lists every variable the application reads, and nothing else. A variable for auth, payments, storage or email belongs there when its integration actually lands. No Cloudflare, Supabase API key or storage account is needed to run the landing/waitlist app. Do not print or commit secrets, and never point a local setup at production data.
 
-The site URL feeds canonical metadata, sitemap and robots and currently falls back to localhost. Next's public environment variables are build-time inputs; deployment must provide a real canonical origin. See installed `node_modules/next/dist/docs/01-app/02-guides/environment-variables.md` before changing configuration behavior.
+| Variable | Required | Read by | Notes |
+| --- | --- | --- | --- |
+| `NEXT_PUBLIC_SITE_URL` | Always for `pnpm build`; optional for `pnpm dev` | `src/lib/env/public.ts` → `src/lib/site.ts` | Absolute `http(s)` origin, no credentials, path, query or fragment; normalised through `URL.origin`. Development and test fall back to `http://localhost:3000`. |
+| `DATABASE_URL` | Whenever a request touches the database | `src/lib/env/server.ts` (`server-only`) | `postgres://` or `postgresql://` with a host. Never imported by a browser module. |
+| `DATABASE_MIGRATION_URL` | Optional | `drizzle.config.ts` | Credentials for `pnpm db:migrate`, `db:generate` and `db:studio`. Falls back to `DATABASE_URL`. |
 
-Drizzle CLI currently reads `.env.local` with dotenv and uses DATABASE_URL; the app reads the same variable through Next. There is no enforced separation of migration/test/runtime URLs yet. Verify the selected target is nonproduction before running migrations or Studio. The client disables prepared statements; confirm direct versus session/transaction-pooler connection requirements using [Supabase connection guidance](https://supabase.com/docs/guides/database/connecting-to-postgres). The runtime role must be server-only and able to insert while bypassing waitlist RLS. Connection string, role and deployment assumptions are not proven merely by the client constructor; FOUNDATION-002 owns that validation.
+**The canonical origin is a build-time input.** Next.js inlines `NEXT_PUBLIC_*` values into the bundle during `next build`, so a build is the last moment a missing or malformed origin can be caught — after that the value is frozen and no runtime check can recover it. A production build therefore **fails** without `NEXT_PUBLIC_SITE_URL` rather than quietly shipping localhost canonical URLs, robots.txt and sitemap. If your `.env.local` predates this rule, add the line from `.env.example`. See installed `node_modules/next/dist/docs/01-app/02-guides/environment-variables.md` before changing configuration behaviour.
+
+**A missing database configuration fails at the database, not at build.** The client is created on first use, so `pnpm build` succeeds with no `DATABASE_URL` configured and a static-only check stays possible; the first query then fails with an error naming the variable. Errors never echo a connection string, because it contains a password.
+
+## Database connections and roles
+
+| Connection | Used by | Privileges it needs |
+| --- | --- | --- |
+| Application (`DATABASE_URL`) | `src/lib/db/index.ts` through the waitlist route | `USAGE` on `public`, `INSERT` on `seller_waitlist` and `brand_waitlist`, and the ability to bypass their RLS (table owner, superuser, or a narrowly granted `BYPASSRLS` role). Nothing more. |
+| Migration (`DATABASE_MIGRATION_URL`, else `DATABASE_URL`) | `pnpm db:migrate`, `db:generate`, `db:studio` | Schema ownership: create and alter tables, enable RLS, grant and revoke. |
+| Test | `pnpm test:db:waitlist`, `pnpm test:env` | Created and destroyed by the scripts themselves. They never read `.env.local` and never target your development database. |
+
+The RLS bypass on the application role is infrastructure authority, not end-user authorisation: migration `0001` revokes every table privilege from `anon` and `authenticated` and adds no client policy, so the browser has no database path to lead data at all. Keep that role's credentials out of any browser module — `src/lib/env/server.ts` is marked `server-only` and `pnpm test:client-boundary` proves it.
+
+The client sets `prepare: false`, which is what a transaction pooler requires: pooled connections cannot carry named prepared statements across requests. Confirm whether your instance wants the direct, session-pooler or transaction-pooler port, and whether TLS is enforced, using [Supabase connection guidance](https://supabase.com/docs/guides/database/connecting-to-postgres). Pool size and connection lifetime under a serverless runtime are still unproven; FOUNDATION-005 owns that. A validated connection string does not prove the deployed role, grants or connection mode — verify those separately, as below.
 
 ## Database and run
 
 For your isolated development database, apply existing migrations before testing persistence:
 
 ```bash
-pnpm db:migrate
+pnpm db:migrate   # uses DATABASE_MIGRATION_URL when set, otherwise DATABASE_URL
 pnpm dev
 ```
 
@@ -36,11 +54,12 @@ Open localhost:3000. Current routes are `/`, `/waitlist/seller`, `/waitlist/bran
 pnpm lint
 pnpm typecheck
 pnpm test:client-boundary
+pnpm test:env
 pnpm test:db:waitlist
 pnpm build
 ```
 
-The waitlist database check requires Docker, `psql`, and `curl`. It starts disposable PostgreSQL 16, creates synthetic roles/data, tests fresh and upgrade migration paths, and exercises both waitlist route variants; it never reads `.env.local` for its database target. The client-boundary check builds a disposable fixture and expects Next.js to reject a client import of `src/lib/db`. There is still no general test runner or CI workflow; [Testing](testing.md) specifies FOUNDATION-003/004 and later expectations. A fresh typecheck may need Next-generated route types. Build fetches next/font resources when they are not cached. None of these local checks proves remote DB connectivity, deployed grants or production configuration.
+The waitlist database check requires Docker, `psql`, `curl` and `setsid`. It starts disposable PostgreSQL 16, creates synthetic roles/data, tests fresh and upgrade migration paths, and exercises both waitlist route variants; it never reads `.env.local` for its database target. The client-boundary check builds disposable fixtures and expects Next.js to reject a client import of `src/lib/db` and of `src/lib/env/server`. The environment check requires `curl` and `setsid`; it copies the app into a disposable `.tmp-env-check/` directory that has no `.env*` file of its own, then asserts that a production build refuses a missing or invalid canonical origin, that a build with no `DATABASE_URL` still succeeds and serves the configured origin in robots.txt and the sitemap, and that a missing or malformed `DATABASE_URL` fails at the waitlist route naming the variable. There is still no general test runner or CI workflow; [Testing](testing.md) specifies FOUNDATION-003/004 and later expectations. A fresh typecheck may need Next-generated route types. Build fetches next/font resources when they are not cached. None of these local checks proves remote DB connectivity, deployed grants or production configuration.
 
 ## Verify a deployed database without exposing secrets
 
@@ -68,4 +87,4 @@ order by role_name, table_name;
 
 Both RLS values must be true and every effective privilege value must be false. This metadata check does not prove the runtime connection role or an end-to-end Data API denial. Perform mutation/API verification only in an explicitly nonproduction project with synthetic fixtures, never against production leads. See [Supabase API security](https://supabase.com/docs/guides/api/securing-your-api) for the exposed-schema and default-grant model.
 
-Future auth/provider/storage/email environment variables belong in the example only when their corresponding integration lands. Keep test/preview/prod connections, buckets and provider modes separate; no real recipients or financial credentials in automated fixtures.
+Future auth/provider/storage/email environment variables belong in the example only when their corresponding integration lands. Keep test/preview/prod connections, buckets and provider modes separate; no real recipients or financial credentials in automated fixtures. The environment contract itself is recorded in [ADR-004](../decisions/ADR-004-environment-contract-and-database-boundary.md), proposed for founder review.
