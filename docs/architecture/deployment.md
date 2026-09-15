@@ -10,7 +10,7 @@ Timebox the initial spike to one focused engineering day, record pass/fail and a
 
 Early spike: build, server route, disposable/nonproduction DB under repeated/concurrent requests and raw-body handling. Record the intended auth cookies, private uploads, images and reconciliation schedule. Later implementation issues exercise enabled flows before LAUNCH-001; private native upload/image processing checks belong to MEDIA-001 when enabled (P1 unless an approved retention requirement advances it). A checklist is not a completed compatibility test.
 
-Check module-level postgres.js lifetime under Workers request-scoped I/O. Hyperdrive may help if demonstrated, but adds configuration; managed Node can keep postgres.js/Supabase. R2 is usable from either host; local disk is not durable proof storage.
+Check the lazily created, module-cached postgres.js client lifetime under Workers request-scoped I/O. Hyperdrive may help if demonstrated, but adds configuration; managed Node can keep postgres.js/Supabase. R2 is usable from either host; local disk is not durable proof storage.
 
 SVG needs no image processing. Do not assume native Sharp works on Workers. Prove safe proof-photo validation/metadata removal or use a supported image service with explicit cost/format limits. Supabase Storage is an alternative after checking server-issued access with Better Auth.
 

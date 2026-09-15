@@ -2,15 +2,17 @@
 
 ## Current reality
 
-`pnpm lint`, `pnpm typecheck` and `pnpm build` cover static/build checks. Merged FOUNDATION-001 adds targeted shell/SQL commands, but there is no general `test` script, Vitest, Playwright or CI workflow. PR #2 records a historical manual browser/database pass. Never report absent tests as passing.
+`pnpm lint`, `pnpm typecheck` and `pnpm build` cover static/build checks. Merged FOUNDATION-001 and FOUNDATION-002 add targeted shell/SQL commands, but there is no general `test` script, Vitest, Playwright or CI workflow. PR #2 records a historical manual browser/database pass. Never report absent tests as passing.
 
-`pnpm test:client-boundary` builds a disposable Next.js fixture whose Client Component imports the real database module. The command passes only when Next rejects that import because of the `server-only` marker.
+`pnpm test:client-boundary` builds disposable Next.js fixtures whose Client Component imports the real database module and then the real server environment module. The command passes only when Next rejects both imports because of the `server-only` marker.
 
-`pnpm test:db:waitlist` requires Docker, `psql`, and `curl`. It creates disposable PostgreSQL 16 databases and synthetic roles, applies both a fresh migration sequence and the 0000→0001 upgrade, runs `tests/db/waitlist-access.sql`, confirms upgrade-row preservation, and POSTs synthetic seller and brand submissions through the real route using a non-owner `BYPASSRLS` server role. The container and fixtures are removed afterward. It never targets the configured development or production database.
+`pnpm test:env` requires `curl` and `setsid`. It copies the application into a disposable `.tmp-env-check/` directory that contains no `.env*` file, so the repository's own `.env.local` is never read and each case supplies its entire configuration. It asserts that a production build refuses a missing canonical origin and an invalid one, that a build with no `DATABASE_URL` still succeeds and that `next start` then serves the configured origin — not localhost — in robots.txt and the sitemap, and that a missing or malformed `DATABASE_URL` makes the waitlist route fail with the variable named in the server log. The fixture and its servers are removed afterward.
+
+`pnpm test:db:waitlist` requires Docker, `psql`, `curl` and `setsid`. It creates disposable PostgreSQL 16 databases and synthetic roles, applies both a fresh migration sequence and the 0000→0001 upgrade, runs `tests/db/waitlist-access.sql`, confirms upgrade-row preservation, and POSTs synthetic seller and brand submissions through the real route using a non-owner `BYPASSRLS` server role. The container and fixtures are removed afterward. It never targets the configured development or production database.
 
 ## Incremental plan
 
-FOUNDATION-001 supplies the reproducible role-level waitlist assertions described above, without a framework. FOUNDATION-003 adds Vitest and a reusable disposable Postgres integration harness; FOUNDATION-004 adds CI and a production-build Playwright smoke journey. Later issues extend meaningful behavior tests rather than installing a second framework.
+FOUNDATION-001 supplies the reproducible role-level waitlist assertions described above and FOUNDATION-002 the environment-contract checks, both without a framework. FOUNDATION-003 adds Vitest and a reusable disposable Postgres integration harness — the connection-string and origin validators in `src/lib/env/` are pure functions and are the natural first unit tests there; FOUNDATION-004 adds CI and a production-build Playwright smoke journey. Later issues extend meaningful behavior tests rather than installing a second framework.
 
 Read the installed version's guides before configuration: `node_modules/next/dist/docs/01-app/02-guides/testing/vitest.md` and `playwright.md`. The Vitest guide notes async Server Component limitations; test those through browser journeys instead of asserting unrepresentative component mocks.
 

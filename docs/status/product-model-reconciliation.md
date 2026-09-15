@@ -1,12 +1,12 @@
 # Product-model reconciliation
 
-**Date:** 2026-09-15. **Owner:** founder. **Task:** [PLAN-002 #55](https://github.com/Mohith1612/billboard-me/issues/55). **Audited main:** `55e41d4`. Planning-only changes; no product code, migrations or dependencies added.
+**Date:** 2026-09-15. **Owner:** founder. **Task:** [PLAN-002 #55](https://github.com/Mohith1612/billboard-me/issues/55). **Original audit:** `55e41d4`; **integrated main:** `8171a2d` after PR #54 merged. Planning-only changes relative to main; the environment implementation is inherited from PR #54.
 
 ## What was inspected
 
-Verified PR #52 merged as `b9bea6d` and PR #53 merged as `55e41d4`; #4 is closed. Read the PRD, all architecture documents, ADRs, glossary, agent instructions, design/development/status guidance, current source/config/schema/migration/test evidence and all 48 GitHub issue specifications (#4–#51), including dependencies, scope, tests and acceptance. PR #54 is open for #5 at head `dc98cd9`; its source/ADR-004 are not in this baseline. Its documented changes must be preserved during later integration, not reported as merged functionality here.
+Verified PR #52 merged as `b9bea6d` and PR #53 merged as `55e41d4`; #4 is closed. Read the PRD, all architecture documents, ADRs, glossary, agent instructions, design/development/status guidance, current source/config/schema/migration/test evidence and all 48 GitHub issue specifications (#4–#51), including dependencies, scope, tests and acceptance. At the original audit PR #54 was open at head `dc98cd9`. It subsequently merged as `8171a2d`, closing #5; this branch now includes its source, targeted environment tests and ADR-004. The five documentation conflicts were reconciled against the actual merged implementation.
 
-The current product remains landing + two waitlists + POST API/database persistence, now with repository RLS/client-role revokes and targeted SQL/shell tests from PR #53. No completed marketplace, seller/buyer flow, auth, production payments, native evidence uploads or general Vitest/Playwright/CI suite exists in audited main. Production migration application remains unverified. Current-state retains those distinctions.
+The current product remains landing + two waitlists + POST API/database persistence, now with repository RLS/client-role revokes and targeted SQL/shell tests from PR #53, plus validated public/server environment modules, lazy `getDb()`, migration-connection selection and environment tests from PR #54. No completed marketplace, seller/buyer flow, auth, production payments, native evidence uploads or general Vitest/Playwright/CI suite exists in audited main. Production migration application remains unverified. Current-state retains those distinctions.
 
 ## Changed model and removed assumptions
 
@@ -39,7 +39,7 @@ All 48 issue IDs are retained. **26 A unchanged; 21 B modified; 1 F re-prioritiz
 | Issue | Disposition | Priority | Reason / acceptance change |
 | --- | --- | --- | --- |
 | [FOUNDATION-001 #4](https://github.com/Mohith1612/billboard-me/issues/4) | A — Unchanged | P0 | Closed by merged PR #53; retain historical access-control acceptance and tests. |
-| [FOUNDATION-002 #5](https://github.com/Mohith1612/billboard-me/issues/5) | A — Unchanged | P0 | Environment contract is independent of the business model; existing PR #54 remains the active implementation. |
+| [FOUNDATION-002 #5](https://github.com/Mohith1612/billboard-me/issues/5) | A — Unchanged | P0 | Environment contract is independent of the business model; PR #54 has now merged and #5 is closed. |
 | [FOUNDATION-003 #6](https://github.com/Mohith1612/billboard-me/issues/6) | B — Modified | P0 | Preserve PR #53 targeted tests; describe the missing general harness accurately. |
 | [FOUNDATION-004 #7](https://github.com/Mohith1612/billboard-me/issues/7) | A — Unchanged | P0 | CI and browser smoke requirements remain needed. |
 | [FOUNDATION-005 #8](https://github.com/Mohith1612/billboard-me/issues/8) | B — Modified | P0 | Native media runtime checks become conditional on enabling uploads. |
@@ -87,7 +87,7 @@ All 48 issue IDs are retained. **26 A unchanged; 21 B modified; 1 F re-prioritiz
 | [FUTURE-003 #50](https://github.com/Mohith1612/billboard-me/issues/50) | A — Unchanged | P3 | Pricing/matching/auction intervention remains an evidence-only future experiment. |
 | [FUTURE-004 #51](https://github.com/Mohith1612/billboard-me/issues/51) | A — Unchanged | P3 | Additional corridor requires its own entity/provider/legal/recovery validation. |
 
-**Priority totals:** previously 34 P0 / 5 P1 / 5 P2 / 4 P3; now **33 / 6 / 5 / 4**. One P0 (#4) is already completed; 32 remain open. MEDIA-001 (#30) alone changes priority. No issue state is changed by this reconciliation. Specific product/policy choices remain pending founder approval even though their planning criteria are now reconciled.
+**Priority totals:** previously 34 P0 / 5 P1 / 5 P2 / 4 P3; now **33 / 6 / 5 / 4**. Two P0 issues (#4 and #5) are completed after PR #54 merged; 31 remain open. MEDIA-001 (#30) alone changes priority. No issue state is changed by this reconciliation; #5 was closed by the founder’s merge of PR #54. Specific product/policy choices remain pending founder approval even though their planning criteria are now reconciled.
 
 **Dependency changes:** CAMPAIGN-001 drops MEDIA-001; PAY-006 drops PROOF-001 and explicitly depends on PAY-004 plus PAY-005; OPS-001 explicitly joins CAMPAIGN-001/PROOF-001 with its existing PAY-006/PAGE-002 prerequisites. These changes allow financial settlement integration before evidence UI without removing evidence/support from overall launch readiness. The local backlog is topologically ordered and both issue bodies and roadmap carry these edges.
 
@@ -107,11 +107,11 @@ The responsibility boundary follows explicit founder direction. Approve the actu
 
 PRD owns scope/obligations; lifecycle owns independent states/authority; database owns conceptual rows/constraints; payments owns dated provider evidence; roadmap/backlog own dependencies. ADR-005 records this meaningful responsibility/funds-flow decision. ADR-003 keeps its inventory proposal and links the refinement; accepted ADR-001/002 remain intact. ADR-004 is already used in PR #54 and is not overwritten. `application-architecture.md` was an empty duplicate removed by PR #52; update the authoritative `overview.md` rather than recreate it. CLAUDE.md remains only a pointer to canonical AGENTS.md. Setup/source files require no business-model edits.
 
-PR #54 overlaps README, database, testing, current-state, known-issues and backlog. Preserve its env/getDb/test facts when that PR merges while retaining this responsibility model and revised dependencies. Whichever PR merges second must reconcile the overlap against actual main and rerun relevant checks. Do not solve documentation conflicts by dropping either set of changes or claiming an open PR is shipped.
+PR #54 is merged. README, testing, current-state, known-issues and backlog had content conflicts; database documentation merged automatically. All now retain its implemented env/getDb/test facts alongside the responsibility model and dependency graph. Application source, test scripts, dependencies and migrations match current main exactly; no product behavior was changed to resolve prose conflicts.
 
 ## Next implementation issue and parallel work
 
-Exactly one recommended issue to finish now: **[FOUNDATION-002 #5 — Validate environment and document database connection roles](https://github.com/Mohith1612/billboard-me/issues/5)**. Its existing PR #54 is open: continue review/fixes there, then founder merge. Do not commission a duplicate implementation. The validated env/DB-role boundary is prerequisite to the broader harness and CI. No payment/domain feature should jump ahead of its unresolved gates.
+Exactly one recommended next implementation issue: **[FOUNDATION-003 #6 — Add behavior tests and a disposable Postgres test harness](https://github.com/Mohith1612/billboard-me/issues/6)**. Its FOUNDATION-002 prerequisite is now merged in PR #54. Extend existing environment, client-boundary and waitlist tests without reducing coverage; the reusable harness then enables CI. No payment/domain feature should jump ahead of its unresolved gates.
 
 Founder demand/rights/provider validation can run alongside this foundation lane. Later template art, page presentation and campaign presentation can run in isolated files after agreed contracts; settlement and evidence are independent runtime paths but share reviewed financial/domain interfaces. Keep auth/identity, schema migrations, payment adapter/state changes and architectural decisions under sequential ownership. Normal settlement independence is not permission for two agents to edit the financial schema simultaneously.
 
@@ -119,7 +119,7 @@ Founder demand/rights/provider validation can run alongside this foundation lane
 
 The reconciliation validates issue coverage/dispositions, priority labels, unchanged bodies, dependency graph and Markdown links/anchors. Existing repository lint/typecheck/build and targeted checks are recorded in the reconciliation PR with actual results and limits. No product tests were invented for prose; no migration was generated or applied to a shared database. Git diff must contain Markdown only. Remote affected issue bodies are compared with the intended specifications after publishing; valid unchanged issues are left untouched.
 
-Verified on 2026-09-15, Node 22.14.0 / pnpm 10.15.1:
+Original verification before PR #54 integration, on 2026-09-15, Node 22.14.0 / pnpm 10.15.1:
 
 | Check | Result / limit |
 | --- | --- |
@@ -131,4 +131,11 @@ Verified on 2026-09-15, Node 22.14.0 / pnpm 10.15.1:
 | `pnpm build` | Pass using an explicit dummy localhost database URL and public site origin; no live database queried |
 | `git diff --check` / scope | Pass; 22 Markdown files only, including two new documents; no product source, dependency or migration changes |
 
-No commercial/provider approval, deployed runtime test, live transaction or production database verification is claimed. Existing PR #53 test teardown was wrapped in an isolated process group for this run so its dev-server children were cleaned up; the test scripts themselves were not changed. PR #54 already proposes a teardown fix. The research and live issue updates do not authorize implementation of unresolved policy choices.
+No commercial/provider approval, deployed runtime test, live transaction or production database verification is claimed. Existing PR #53 test teardown was wrapped in an isolated process group for this run so its dev-server children were cleaned up; the test scripts themselves were not changed. PR #54 has since merged its teardown fix; the integrated scripts own process-group cleanup. The research and live issue updates do not authorize implementation of unresolved policy choices.
+
+
+### Verification after integrating merged PR #54
+
+On 2026-09-15 against main `8171a2d`, lint, typecheck, production build and all three targeted commands passed: `test:client-boundary`, `test:env` (six reported cases), and `test:db:waitlist` (disposable fresh/upgrade/role/route checks). Test servers, fixture directory and database container were cleaned up. The production build used an explicit dummy database URL and public origin; no shared database was accessed.
+
+The final plan check covers 27 Markdown documents and 90 local links/anchors, all 48 unchanged-or-reconciled live issue specifications and their acyclic dependencies. #5 is now closed by PR #54; priority totals remain 33/6/5/4, with two completed P0 issues. No conflict markers remain. Source, test scripts, dependency/configuration and migration files are identical to main; the PR diff remains 22 Markdown files. FOUNDATION-003 (#6) is the next implementation issue.

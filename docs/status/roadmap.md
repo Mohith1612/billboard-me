@@ -4,7 +4,7 @@
 
 ## Start here
 
-**Next issue to finish: [FOUNDATION-002 — Validate environment and document database connection roles (#5)](https://github.com/Mohith1612/billboard-me/issues/5).** FOUNDATION-001 (#4) merged in PR #53. FOUNDATION-002 already has open [PR #54](https://github.com/Mohith1612/billboard-me/pull/54); handle review/fixes there and obtain founder merge, without duplicating implementation. That establishes the validated environment/DB boundary for the general harness and CI.
+**Next implementation issue: [FOUNDATION-003 — Add behavior tests and a disposable Postgres test harness (#6)](https://github.com/Mohith1612/billboard-me/issues/6).** FOUNDATION-001 and FOUNDATION-002 merged in PR #53 and [PR #54](https://github.com/Mohith1612/billboard-me/pull/54). The validated environment/lazy database boundary and existing targeted checks are available; extend them into a reusable harness before FOUNDATION-004 adds CI.
 
 In parallel, founder runs seller/buyer matching ([#9](https://github.com/Mohith1612/billboard-me/issues/9)), physical rights/production trial ([#10](https://github.com/Mohith1612/billboard-me/issues/10)) and provider eligibility ([#11](https://github.com/Mohith1612/billboard-me/issues/11)). These are evidence/decision work, not three product-feature teams. Existing lead protection need not wait for demand validation.
 

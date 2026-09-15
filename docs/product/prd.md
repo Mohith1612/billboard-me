@@ -1,6 +1,6 @@
 # Billboard.me — Master Product Requirements
 
-**Owner:** founder. **Status:** PR #52 blueprint reconciled to the founder’s marketplace direction on 2026-09-15; unsettled policies remain proposed. **Repository baseline:** `55e41d4` (PR #53 merged). No product implementation in this reconciliation. [Audit](../status/current-state.md) describes shipped code; this document describes intended behavior. [Roadmap](../status/roadmap.md) and [backlog](../status/backlog.md) define execution. [AGENTS.md](../../AGENTS.md) remains the sole authority for agent rules.
+**Owner:** founder. **Status:** PR #52 blueprint reconciled to the founder’s marketplace direction on 2026-09-15; unsettled policies remain proposed. **Repository baseline:** `8171a2d` (PR #54 and PR #53 merged). No product implementation in this reconciliation. [Audit](../status/current-state.md) describes shipped code; this document describes intended behavior. [Roadmap](../status/roadmap.md) and [backlog](../status/backlog.md) define execution. [AGENTS.md](../../AGENTS.md) remains the sole authority for agent rules.
 
 ## Product
 
@@ -264,7 +264,7 @@ V1/V2/V4/V6 and provider eligibility can run while engineering secures the curre
 | --- | --- | --- | --- | --- |
 | Buyers may not value ambient object visibility | No paid-campaign evidence exists; visibility is not attributable outcomes | Critical product | V2, sell a clear context/deliverable before growing supply | Before live launch; revisit at 1–5 |
 | Provider eligibility may block the model | Normal settlement does not waive provider turnover/KYC/category restrictions | Critical commercial | Written approval of actual marketplace flow; no escrow workaround | Before payment implementation/live collection |
-| Waitlist PII deployment is not verified | Repository migration enables RLS and removes client grants; actual application/exposed schemas/runtime role remain environment-specific | High engineering | Deploy 0001 under change control and record metadata-only grant/RLS verification | FOUNDATION-001 / FOUNDATION-002 |
+| Waitlist PII deployment is not verified | Repository migration enables RLS and removes client grants; actual application/exposed schemas/runtime role remain environment-specific | High engineering | Deploy 0001 under change control and record metadata-only grant/RLS verification | FOUNDATION-005 deployment verification |
 | Fee/fulfillment promises are inconsistent with economics | Landing says no fees and promises print/delivery | High product | Founder fee policy, fulfillment trial and truthful copy | Before publishing payable terms |
 | Seller may lack advertising rights | Teams, events, employers and existing sponsors may restrict inventory | High operational | Manual permission/exclusivity check; reject unavailable rights | Before page approval |
 | Seller nonperformance after settlement | Sponsor can pay and seller can settle before missing an event; recovery may be unavailable | High shared commercial | Explicit obligations, truthful risk disclosure, refund/dispute funding policy and V7/V8; no guarantee inferred | Before payment terms |

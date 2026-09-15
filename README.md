@@ -27,7 +27,12 @@ pnpm dev
 
 Open <http://localhost:3000>.
 
-Full setup instructions, including Supabase, are in
+`.env.example` lists every variable the app reads. `NEXT_PUBLIC_SITE_URL` is
+required by `pnpm build` — it is inlined into the bundle, so a production build
+fails rather than ship localhost canonical URLs — and falls back to localhost in
+development. `DATABASE_URL` is only needed once a request touches the database.
+
+Full setup instructions, including the privileges each connection needs, are in
 [`docs/development/setup.md`](docs/development/setup.md).
 
 ## Scripts
@@ -39,7 +44,8 @@ Full setup instructions, including Supabase, are in
 | `pnpm start` | Serve the production build |
 | `pnpm lint` | ESLint |
 | `pnpm typecheck` | `tsc --noEmit` |
-| `pnpm test:client-boundary` | Prove the database module cannot enter a client bundle |
+| `pnpm test:client-boundary` | Prove the database and server-env modules cannot enter a client bundle |
+| `pnpm test:env` | Verify the environment contract: canonical origin, database-free build, database boundary |
 | `pnpm test:db:waitlist` | Verify waitlist grants, RLS, migrations, and route persistence in Docker |
 | `pnpm db:generate` | Generate a Drizzle migration from the schema |
 | `pnpm db:migrate` | Apply pending migrations |
@@ -60,7 +66,7 @@ still need verification. It remains a single monolith.
 src/app/(marketing)   Public landing page and waitlist routes
 src/app/api           Route handlers
 src/components        UI, grouped by area (marketing, waitlist)
-src/lib               Domain and infrastructure modules (db, waitlist, site)
+src/lib               Domain and infrastructure modules (env, db, waitlist, site)
 drizzle               Generated SQL migrations — never edit an applied one
 docs                  Architecture, product, decisions (ADRs), status, design
 ```
@@ -71,7 +77,8 @@ docs                  Architecture, product, decisions (ADRs), status, design
   first paid-campaign slice, validation experiments and Not Yet scope
 - [`docs/status/roadmap.md`](docs/status/roadmap.md) — dependencies and stage gates
 - [`docs/status/backlog.md`](docs/status/backlog.md) — 48 actual GitHub issues,
-  ordered and classified P0–P3; FOUNDATION-001 is merged, FOUNDATION-002 is in PR #54
+  ordered and classified P0–P3; FOUNDATION-001 and FOUNDATION-002 are merged,
+  FOUNDATION-003 is next
 - [`docs/status/product-model-reconciliation.md`](docs/status/product-model-reconciliation.md) — marketplace responsibility changes and all 48 issue dispositions
 - [`CONTEXT.md`](CONTEXT.md) — canonical domain vocabulary
 - [`docs/architecture/overview.md`](docs/architecture/overview.md) — how the app

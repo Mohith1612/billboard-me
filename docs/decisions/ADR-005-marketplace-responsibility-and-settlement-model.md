@@ -1,6 +1,6 @@
 # ADR-005: Marketplace responsibility and independent settlement
 
-**Date:** 2026-09-15. **Status:** Marketplace responsibility boundary accepted by explicit founder direction; normal-settlement implementation and specific commercial policies proposed pending PAY-001/DECISION-001. **Issue:** [PLAN-002 #55](https://github.com/Mohith1612/billboard-me/issues/55). ADR-004 is reserved by open PR #54 for environment configuration; do not reuse its number.
+**Date:** 2026-09-15. **Status:** Marketplace responsibility boundary accepted by explicit founder direction; normal-settlement implementation and specific commercial policies proposed pending PAY-001/DECISION-001. **Issue:** [PLAN-002 #55](https://github.com/Mohith1612/billboard-me/issues/55). [ADR-004](ADR-004-environment-contract-and-database-boundary.md) accompanies merged PR #54’s environment configuration; do not reuse its number.
 
 ## Context
 

@@ -37,7 +37,7 @@ The [lifecycle](transaction-lifecycle.md) is shared by UI, route handlers, recon
 | Next.js 16.3.5 / React 19.2.8 / TypeScript | Installed; retain. Read installed docs before code. No framework rewrite to satisfy deployment preference |
 | Tailwind v4 | Installed; preserve tokens and media-kit design |
 | shadcn/ui | Not installed; add selected primitives when application UI needs them, with dependency justification |
-| Zod / Drizzle / postgres.js | Installed; retain, add runtime configuration validation, private access and transaction constraints |
+| Zod / Drizzle / postgres.js | Installed; retain validated environment/lazy DB boundary and private access from PR #53/54; add transaction constraints as domain issues require |
 | Better Auth | Accepted plan, absent; one email login method plus seller invitations. Supabase Auth is an alternative only if an evidenced integration problem justifies an ADR; do not run both |
 | Supabase Postgres | Retain managed database; public Data API access unnecessary for the server-owned model |
 | R2 vs Supabase Storage | R2 accepted preference, absent. Keep if private signed access works on chosen host. Supabase Storage may reduce vendor operations, but Better Auth does not automatically supply its JWT/RLS identity; compare actual integration in MEDIA-001 before an ADR deviation |
